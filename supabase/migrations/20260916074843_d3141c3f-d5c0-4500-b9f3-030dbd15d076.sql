@@ -1,0 +1,11 @@
+DROP FUNCTION IF EXISTS public.available_stock();
+REVOKE ALL ON FUNCTION public.reserve_stock(uuid, jsonb, integer) FROM PUBLIC, anon, authenticated;
+REVOKE ALL ON FUNCTION public.release_reservation(uuid) FROM PUBLIC, anon, authenticated;
+REVOKE ALL ON FUNCTION public.consume_reservation(uuid, uuid) FROM PUBLIC, anon, authenticated;
+REVOKE ALL ON FUNCTION public.restore_order_stock(uuid) FROM PUBLIC, anon, authenticated;
+REVOKE ALL ON FUNCTION public.expire_stock_reservations() FROM PUBLIC, anon, authenticated;
+GRANT EXECUTE ON FUNCTION public.reserve_stock(uuid, jsonb, integer) TO service_role;
+GRANT EXECUTE ON FUNCTION public.release_reservation(uuid) TO service_role;
+GRANT EXECUTE ON FUNCTION public.consume_reservation(uuid, uuid) TO service_role;
+GRANT EXECUTE ON FUNCTION public.restore_order_stock(uuid) TO service_role;
+GRANT EXECUTE ON FUNCTION public.expire_stock_reservations() TO service_role;
