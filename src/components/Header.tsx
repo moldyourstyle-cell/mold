@@ -12,7 +12,7 @@ const navLinks = [
     to: "/shop" as const,
     search: { category: c.slug },
   })),
-  { label: "Sale", to: "/shop" as const, search: { sale: true } },
+  { label: "Clearance Sale", to: "/shop" as const, search: { sale: true } },
 ];
 
 export function Header() {
@@ -53,9 +53,10 @@ export function Header() {
               key={l.label}
               to={l.to}
               search={l.search}
-              className="group relative text-[11px] font-medium uppercase tracking-[0.14em]"
+              className="group relative inline-flex items-center text-[11px] font-medium uppercase tracking-[0.14em]"
             >
               {l.label}
+              {l.label === "Clearance Sale" && <span aria-hidden="true" className="ml-2 h-2 w-2 animate-pulse rounded-full bg-red-600" />}
               <span className="absolute -bottom-0.5 left-0 h-px w-0 bg-accent transition-all duration-300 group-hover:w-full" />
             </Link>
           ))}
@@ -156,9 +157,10 @@ export function Header() {
                 to={l.to}
                 search={l.search}
                 onClick={() => setMenuOpen(false)}
-                className="display block border-b border-paper/10 py-3.5 text-2xl"
+                className="display flex items-center border-b border-paper/10 py-3.5 text-2xl"
               >
                 {l.label}
+                {l.label === "Clearance Sale" && <span aria-hidden="true" className="ml-2 h-2 w-2 animate-pulse rounded-full bg-red-500" />}
               </Link>
             ))}
             <Link

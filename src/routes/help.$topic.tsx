@@ -41,12 +41,22 @@ function HelpPage() {
           <p key={i}>{para}</p>
         ))}
       </div>
-      <Link
-        to="/shop"
-        className="mt-10 inline-block bg-ink px-8 py-4 text-[11px] font-semibold uppercase tracking-[0.14em] text-paper transition-colors hover:bg-accent hover:text-ink"
-      >
-        Shop the drop
-      </Link>
+      <div className="mt-10 flex flex-wrap gap-3">
+        {topic.title === "Contact" && (
+          <a
+            href="mailto:moldyourstyle@gmail.com"
+            className="inline-block border border-ink px-8 py-4 text-[11px] font-semibold uppercase tracking-[0.14em] text-ink transition-colors hover:bg-ink hover:text-paper"
+          >
+            Email us
+          </a>
+        )}
+        <Link
+          to="/shop"
+          className="inline-block bg-ink px-8 py-4 text-[11px] font-semibold uppercase tracking-[0.14em] text-paper transition-colors hover:bg-accent hover:text-ink"
+        >
+          Shop the drop
+        </Link>
+      </div>
     </div>
   );
 }

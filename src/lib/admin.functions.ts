@@ -19,6 +19,7 @@ const productInput = z.object({
   sku: z.string().default(""),
   tags: z.array(z.string()).default([]),
   isNew: z.boolean().default(false),
+  isClearanceSale: z.boolean().default(false),
   isPublished: z.boolean().default(true),
 });
 
@@ -116,6 +117,7 @@ export const createProduct = createServerFn({ method: "POST" })
         sku: data.sku,
         tags: data.tags,
         is_new: data.isNew,
+        is_clearance_sale: data.isClearanceSale,
         is_published: data.isPublished,
       })
       .select()
@@ -151,6 +153,7 @@ export const updateProduct = createServerFn({ method: "POST" })
         sku: data.values.sku,
         tags: data.values.tags,
         is_new: data.values.isNew,
+        is_clearance_sale: data.values.isClearanceSale,
         is_published: data.values.isPublished,
       })
       .eq("id", data.id)

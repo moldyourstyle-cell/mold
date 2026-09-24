@@ -32,6 +32,7 @@ type FormState = {
   sku: string;
   tags: string[];
   isNew: boolean;
+  isClearanceSale: boolean;
   isPublished: boolean;
 };
 
@@ -51,6 +52,7 @@ const empty: FormState = {
   sku: "",
   tags: [],
   isNew: false,
+  isClearanceSale: false,
   isPublished: true,
 };
 
@@ -115,6 +117,7 @@ function ProductFormPage() {
         sku: existing.sku,
         tags: existing.tags,
         isNew: existing.isNew ?? false,
+        isClearanceSale: existing.isClearanceSale ?? false,
         isPublished: existing.isPublished,
       });
     }
@@ -130,11 +133,11 @@ function ProductFormPage() {
       return doUpdate({ data: { id, values } });
     },
 
-    onSuccess: () => {
+    onSuccess: (product) => {
       queryClient.invalidateQueries({ queryKey: ["catalog"] });
       queryClient.invalidateQueries({ queryKey: ["admin-products"] });
       setMessage(isNew ? "Product created." : "Product updated.");
-      if (isNew) navigate({ to: "/admin" });
+      if (isNew) navigate({ to: "/admin/products" });
     },
     onError: (err) => setMessage(err instanceof Error ? err.message : "Failed to save."),
   });
@@ -219,7 +222,7 @@ function ProductFormPage() {
             />
           </label>
           <label className="block">
-            <span className="label-mono text-muted-ink">Compare-at price</span>
+            <span className="label-mono text-muted-ink">Compare-at price (original price)</span>
             <input
               type="number"
               min={0}
@@ -466,7 +469,15 @@ function ProductFormPage() {
               checked={form.isNew}
               onChange={(e) => update("isNew", e.target.checked)}
             />
-            <span className="label-mono text-muted-ink">New arrival</span>
+            <span className="label-mono text-muted-ink">New Drop</span>
+          </label>
+          <label className="flex items-center gap-2">
+            <input
+              type="checkbox"
+              checked={form.isClearanceSale}
+              onChange={(e) => update("isClearanceSale", e.target.checked)}
+            />
+            <span className="label-mono text-muted-ink">Clearance Sale</span>
           </label>
           <label className="flex items-center gap-2">
             <input

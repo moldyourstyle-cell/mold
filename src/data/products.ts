@@ -24,6 +24,7 @@ export type Product = {
   sku: string;
   tags: string[];
   isNew?: boolean | undefined;
+  isClearanceSale?: boolean | undefined;
   isPublished: boolean;
 
   createdAt: string;
@@ -89,4 +90,3 @@ export function discountPercent(p: Product) {
   if (!p.compareAtPrice) return 0;
   return Math.round(((p.compareAtPrice - p.price) / p.compareAtPrice) * 100);
 }
-

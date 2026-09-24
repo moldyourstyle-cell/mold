@@ -22,6 +22,7 @@ export function rowToProduct(row: Row): Product {
     sku: row.sku,
     tags: row.tags,
     isNew: row.is_new,
+    isClearanceSale: row.is_clearance_sale,
     isPublished: row.is_published,
     createdAt: row.created_at,
     updatedAt: row.updated_at,
@@ -90,4 +91,3 @@ export const listProducts = createServerFn({ method: "GET" }).handler(async () =
     return product;
   });
 });
-

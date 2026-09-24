@@ -56,7 +56,7 @@ export function Footer() {
             </li>
             <li>
               <Link to="/shop" search={{ sale: true }} className="hover:text-paper">
-                Sale
+                Clearance Sale
               </Link>
             </li>
           </ul>
@@ -109,7 +109,7 @@ export function Footer() {
       <div className="border-t border-paper/10">
         <div className="mx-auto flex max-w-[1500px] flex-col items-start justify-between gap-3 px-4 py-5 sm:flex-row sm:items-center sm:px-6">
           <span className="label-mono text-paper/40">© 2026 MOLD — Chennai, IN</span>
-          <span className="label-mono text-paper/40">UPI · Cards · Net banking · COD</span>
+          <span className="label-mono text-paper/40">COD</span>
         </div>
       </div>
     </footer>

@@ -13,14 +13,21 @@ function ProductsPage() {
   const fetchProducts = useServerFn(listAdminProducts);
   const removeProduct = useServerFn(deleteProduct);
   const [search, setSearch] = useState("");
+  const [collection, setCollection] = useState<"all" | "new-drop" | "clearance">("all");
   const { data: products = [], isLoading, error } = useQuery({
     queryKey: ["admin-products"],
     queryFn: () => fetchProducts({ data: undefined }),
   });
   const visible = useMemo(() => {
     const query = search.trim().toLowerCase();
-    return products.filter((product) => !query || `${product.name} ${product.slug} ${product.sku} ${product.category}`.toLowerCase().includes(query));
-  }, [products, search]);
+    return products.filter((product) => {
+      const matchesSearch = !query || `${product.name} ${product.slug} ${product.sku} ${product.category}`.toLowerCase().includes(query);
+      const matchesCollection = collection === "all" ||
+        (collection === "new-drop" && product.isNew) ||
+        (collection === "clearance" && product.isClearanceSale);
+      return matchesSearch && matchesCollection;
+    });
+  }, [products, search, collection]);
   const remove = useMutation({
     mutationFn: (id: string) => removeProduct({ data: id }),
     onSuccess: () => {
@@ -35,6 +42,13 @@ function ProductsPage() {
       <div className="mt-6 flex flex-wrap items-end justify-between gap-4">
         <label className="label-mono w-full max-w-sm text-muted-ink">Search catalog
           <input value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Name, slug, SKU or category" className="mt-1 block w-full border border-line bg-transparent px-3 py-2.5 text-sm text-ink" />
+        </label>
+        <label className="label-mono w-full max-w-xs text-muted-ink">Collection
+          <select value={collection} onChange={(event) => setCollection(event.target.value as typeof collection)} className="mt-1 block w-full border border-line bg-paper px-3 py-2.5 text-sm text-ink">
+            <option value="all">All products</option>
+            <option value="new-drop">New Drop</option>
+            <option value="clearance">Clearance Sale</option>
+          </select>
         </label>
         <Link to="/admin/product/$id" params={{ id: "new" }} search={{}} className="bg-ink px-5 py-3 label-mono text-paper transition-colors hover:bg-accent hover:text-ink">+ Add product</Link>
       </div>

@@ -144,6 +144,7 @@ export type Database = {
           id: string
           images: string[]
           is_new: boolean
+          is_clearance_sale: boolean
           is_published: boolean
           name: string
           price: number
@@ -164,6 +165,7 @@ export type Database = {
           id?: string
           images?: string[]
           is_new?: boolean
+          is_clearance_sale?: boolean
           is_published?: boolean
           name: string
           price: number
@@ -184,6 +186,7 @@ export type Database = {
           id?: string
           images?: string[]
           is_new?: boolean
+          is_clearance_sale?: boolean
           is_published?: boolean
           name?: string
           price?: number

@@ -49,7 +49,7 @@ function Home() {
 
 
       {/* LATEST DROP */}
-      <section className="mx-auto max-w-[1500px] px-4 py-16 sm:px-6 sm:py-24">
+      <section className="mx-auto max-w-[1500px] px-4 pb-16 pt-0 sm:px-6 sm:pb-24 sm:pt-0">
         <div className="mb-10 flex items-end justify-between border-b border-line pb-5">
           <div>
             <span className="label-mono text-muted-ink">(01) — Latest</span>
@@ -68,7 +68,7 @@ function Home() {
       {/* CATEGORIES */}
       <section className="mx-auto max-w-[1500px] px-4 pb-16 sm:px-6 sm:pb-24">
         <span className="label-mono text-muted-ink">(02) — Departments</span>
-        <div className="mt-6 grid grid-cols-1 gap-4 sm:gap-5 md:grid-cols-2">
+        <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-5 md:grid-cols-4">
           {categories.map((c) => (
             <CategoryCard
               key={c.slug}

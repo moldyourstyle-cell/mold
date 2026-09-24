@@ -57,7 +57,7 @@ function Shop() {
   let list = products.filter((p) => {
     if (search.category && p.category !== search.category) return false;
     if (search.size && !p.sizes.includes(search.size)) return false;
-    if (search.sale && !p.compareAtPrice) return false;
+    if (search.sale && !p.isClearanceSale) return false;
     if (search.inStock && p.stock === 0) return false;
     if (search.maxPrice && p.price > search.maxPrice) return false;
     if (search.q) {
@@ -80,10 +80,10 @@ function Shop() {
   return (
     <div className="mx-auto max-w-[1500px] px-4 py-10 sm:px-6 sm:py-14">
       <span className="label-mono text-muted-ink">
-        Shop {active ? `— ${active.name}` : "— All"}
+        Shop {search.sale ? "— Clearance Sale" : active ? `— ${active.name}` : "— All"}
       </span>
       <h1 className="display mt-2 text-[clamp(2.5rem,8vw,6rem)]">
-        {active ? active.name : "All pieces"}
+        {search.sale ? "Clearance Sale" : active ? active.name : "All pieces"}
       </h1>
       {active && <p className="mt-4 max-w-[46ch] text-sm text-muted-ink">{active.blurb}</p>}
 
