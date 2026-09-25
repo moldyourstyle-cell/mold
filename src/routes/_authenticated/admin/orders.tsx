@@ -40,21 +40,28 @@ function AdminOrders() {
   const removeOrder = useServerFn(deleteOrder);
   const [filter, setFilter] = useState<OrderStatus | "all">("all");
   const [expanded, setExpanded] = useState<string | null>(null);
+  const [actionError, setActionError] = useState("");
 
   const { data: orders = [], isLoading, error } = useQuery({
     queryKey: ["admin-orders"],
     queryFn: () => fetchOrders({ data: undefined }),
   });
 
-  const invalidate = () => queryClient.invalidateQueries({ queryKey: ["admin-orders"] });
+  const invalidate = () => Promise.all([
+    queryClient.invalidateQueries({ queryKey: ["admin-orders"] }),
+    queryClient.invalidateQueries({ queryKey: ["catalog"] }),
+    queryClient.invalidateQueries({ queryKey: ["admin-management-data"] }),
+  ]);
 
   const statusMutation = useMutation({
     mutationFn: (vars: { id: string; status: OrderStatus }) => setStatus({ data: vars }),
     onSuccess: invalidate,
+    onError: (failure) => setActionError(failure instanceof Error ? failure.message : "Could not update order."),
   });
   const deleteMutation = useMutation({
     mutationFn: (id: string) => removeOrder({ data: id }),
     onSuccess: invalidate,
+    onError: (failure) => setActionError(failure instanceof Error ? failure.message : "Could not delete order."),
   });
 
   const visible = filter === "all" ? orders : orders.filter((o) => o.status === filter);
@@ -78,6 +85,8 @@ function AdminOrders() {
         </Link>
       </div>
       <AdminOperationsNav />
+
+      {actionError && <p role="alert" className="mt-5 border-l-2 border-red-600 pl-4 text-sm text-red-700">{actionError}</p>}
 
       <div className="mt-8 grid gap-4 sm:grid-cols-3">
         <Stat label="Total orders" value={String(orders.length)} />

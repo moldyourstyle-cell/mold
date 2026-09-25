@@ -1,10 +1,10 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
-import { useQueryClient } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useStore } from "@/lib/store";
 import { formatINR } from "@/lib/format";
-import { placeOrder } from "@/lib/orders.functions";
+import { placeOrder, validateCheckoutCoupon } from "@/lib/orders.functions";
 import {
   clearReservation,
   getReservation,
@@ -14,6 +14,7 @@ import {
 import { saveRecentOrder } from "@/lib/recent-orders";
 import { supabase } from "@/integrations/supabase/client";
 import { listSavedAddresses, saveAddress, type SavedAddress } from "@/lib/saved-addresses.functions";
+import { getCheckoutPricing } from "@/lib/admin-operations.functions";
 
 
 
@@ -32,16 +33,24 @@ export const Route = createFileRoute("/checkout")({
   component: Checkout,
 });
 
-const COD_FEE = 49;
-
 /** Tracks whether any checkout screen is still open (survives dev double-mounts). */
 let checkoutMounted = 0;
 
 function Checkout() {
-  const { detailedLines, subtotal, shipping, total, clearCart } = useStore();
+  const { detailedLines, subtotal, clearCart } = useStore();
   const submitOrder = useServerFn(placeOrder);
+  const checkCoupon = useServerFn(validateCheckoutCoupon);
   const fetchSavedAddresses = useServerFn(listSavedAddresses);
   const storeSavedAddress = useServerFn(saveAddress);
+  const loadCheckoutPricing = useServerFn(getCheckoutPricing);
+  const { data: pricing, isLoading: pricingLoading, error: pricingError } = useQuery({
+    queryKey: ["checkout-pricing"],
+    queryFn: () => loadCheckoutPricing(),
+  });
+  const shippingFee = pricing?.shippingFee ?? 99;
+  const freeShippingThreshold = pricing?.freeShippingThreshold ?? 1999;
+  const codFee = pricing?.codFee ?? 49;
+  const shipping = subtotal === 0 || subtotal >= freeShippingThreshold ? 0 : shippingFee;
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [confirmed, setConfirmed] = useState<{ orderNumber: string; total: number } | null>(
@@ -52,6 +61,10 @@ function Checkout() {
   const [savedAddresses, setSavedAddresses] = useState<SavedAddress[]>([]);
   const [selectedAddressId, setSelectedAddressId] = useState("");
   const [accountEmail, setAccountEmail] = useState("");
+  const [couponCode, setCouponCode] = useState("");
+  const [appliedCoupon, setAppliedCoupon] = useState<{ code: string; discountAmount: number } | null>(null);
+  const [couponMessage, setCouponMessage] = useState("");
+  const [checkingCoupon, setCheckingCoupon] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
@@ -71,6 +84,28 @@ function Checkout() {
   }, [fetchSavedAddresses]);
 
   const selectedAddress = savedAddresses.find((address) => address.id === selectedAddressId);
+
+  async function applyCoupon() {
+    const code = couponCode.trim();
+    if (!code) {
+      setCouponMessage("Enter a coupon code.");
+      setAppliedCoupon(null);
+      return;
+    }
+    setCheckingCoupon(true);
+    setCouponMessage("");
+    try {
+      const result = await checkCoupon({ data: { code, subtotal } });
+      setAppliedCoupon(result);
+      setCouponCode(result.code);
+      setCouponMessage("Coupon applied.");
+    } catch (err) {
+      setAppliedCoupon(null);
+      setCouponMessage(err instanceof Error ? err.message : "This coupon could not be applied.");
+    } finally {
+      setCheckingCoupon(false);
+    }
+  }
 
   // Leaving checkout without ordering puts the held pieces back on sale.
   useEffect(() => {
@@ -170,6 +205,7 @@ function Checkout() {
           pincode: String(form.get("pincode") ?? ""),
           paymentMethod: "cod",
           notes: String(form.get("notes") ?? ""),
+          ...(appliedCoupon ? { couponCode: appliedCoupon.code } : {}),
           reservationToken: reservation.token,
           items,
         },
@@ -280,29 +316,62 @@ function Checkout() {
               </div>
             ))}
           </div>
+          <div className="mt-6 border-y border-line py-4">
+            <label htmlFor="coupon-code" className="label-mono text-muted-ink">Coupon code</label>
+            <div className="mt-2 flex gap-2">
+              <input
+                id="coupon-code"
+                value={couponCode}
+                onChange={(event) => {
+                  setCouponCode(event.target.value);
+                  if (appliedCoupon) setAppliedCoupon(null);
+                  setCouponMessage("");
+                }}
+                placeholder="Enter code"
+                autoComplete="off"
+                className="min-w-0 flex-1 border border-line bg-transparent px-3 py-2 text-sm uppercase outline-none focus:border-ink"
+              />
+              <button
+                type="button"
+                onClick={applyCoupon}
+                disabled={checkingCoupon || !couponCode.trim()}
+                className="border border-ink px-4 py-2 label-mono transition-colors hover:bg-ink hover:text-paper disabled:opacity-50"
+              >
+                {checkingCoupon ? "Checking…" : appliedCoupon ? "Apply again" : "Apply"}
+              </button>
+            </div>
+            {couponMessage && <p role="status" className={`mt-2 text-xs ${appliedCoupon ? "text-green-700" : "text-red-600"}`}>{couponMessage}</p>}
+          </div>
           <div className="label-mono mt-6 flex justify-between text-muted-ink">
             <span>Subtotal</span>
             <span>{formatINR(subtotal)}</span>
           </div>
+          {appliedCoupon && (
+            <div className="label-mono mt-3 flex justify-between text-green-700">
+              <span>Coupon ({appliedCoupon.code})</span>
+              <span>−{formatINR(appliedCoupon.discountAmount)}</span>
+            </div>
+          )}
           <div className="label-mono mt-3 flex justify-between text-muted-ink">
             <span>Shipping</span>
             <span>{shipping === 0 ? "Free" : formatINR(shipping)}</span>
           </div>
           <div className="label-mono mt-3 flex justify-between text-muted-ink">
             <span>COD handling</span>
-            <span>{formatINR(COD_FEE)}</span>
+            <span>{formatINR(codFee)}</span>
           </div>
           <div className="mt-5 flex justify-between border-t border-line pt-4 text-sm font-semibold">
             <span>Total</span>
-            <span>{formatINR(total + COD_FEE)}</span>
+            <span>{formatINR(subtotal - (appliedCoupon?.discountAmount ?? 0) + shipping + codFee)}</span>
           </div>
+          {pricingError && <p role="alert" className="mt-4 text-sm text-red-600">Could not load current delivery fees. Refresh the page before placing your order.</p>}
           {error && <p className="mt-4 text-sm text-red-600">{error}</p>}
           <button
             type="submit"
-            disabled={submitting}
+            disabled={submitting || pricingLoading || !!pricingError}
             className="mt-6 w-full bg-ink py-4 text-[11px] font-semibold uppercase tracking-[0.14em] text-paper transition-colors hover:bg-accent hover:text-ink disabled:opacity-60"
           >
-            {submitting ? "Placing order…" : "Place order"}
+            {submitting ? "Placing order…" : pricingLoading ? "Loading fees…" : "Place order"}
           </button>
           <p className="label-mono mt-4 text-center text-muted-ink">
             Pay on delivery · GST inclusive

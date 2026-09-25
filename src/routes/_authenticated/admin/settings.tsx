@@ -33,7 +33,7 @@ function SettingsPage() {
         if (passwordResult.error) throw passwordResult.error;
       }
     },
-    onSuccess: () => { setNotice("Settings saved."); setForm((current) => ({ ...current, password: "", confirmPassword: "" })); void queryClient.invalidateQueries({ queryKey: ["admin-store-settings"] }); },
+    onSuccess: () => { setNotice("Settings saved."); setForm((current) => ({ ...current, password: "", confirmPassword: "" })); void queryClient.invalidateQueries({ queryKey: ["admin-store-settings"] }); void queryClient.invalidateQueries({ queryKey: ["checkout-pricing"] }); },
     onError: (failure) => setNotice(failure instanceof Error ? failure.message : "Could not save settings."),
   });
 

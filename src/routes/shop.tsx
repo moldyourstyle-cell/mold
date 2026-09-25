@@ -1,5 +1,5 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { allSizes, categories, type CategorySlug } from "@/data/products";
+import { categories, type CategorySlug } from "@/data/products";
 import { useCatalog } from "@/lib/catalog";
 
 import { ProductGrid } from "@/components/ProductGrid";
@@ -49,6 +49,7 @@ function Shop() {
   const search = Route.useSearch();
   const navigate = useNavigate({ from: "/shop" });
   const products = useCatalog();
+  const standardSizes = ["XS", "S", "M", "L", "XL", "XXL", "XXXL"];
 
 
   const setSearch = (patch: Partial<ShopSearch>) =>
@@ -56,7 +57,7 @@ function Shop() {
 
   let list = products.filter((p) => {
     if (search.category && p.category !== search.category) return false;
-    if (search.size && !p.sizes.includes(search.size)) return false;
+    if (search.size && !p.sizes.some((size) => size.toUpperCase() === search.size)) return false;
     if (search.sale && !p.isClearanceSale) return false;
     if (search.inStock && p.stock === 0) return false;
     if (search.maxPrice && p.price > search.maxPrice) return false;
@@ -90,27 +91,11 @@ function Shop() {
       {/* Filters */}
       <div className="mt-8 space-y-4 border-y border-line py-4">
         <div className="flex flex-wrap items-center gap-2">
-          <span className="label-mono mr-2 text-muted-ink">Category</span>
-          <FilterChip active={!search.category} onClick={() => setSearch({ category: undefined })}>
-            All
-          </FilterChip>
-          {categories.map((c) => (
-            <FilterChip
-              key={c.slug}
-              active={search.category === c.slug}
-              onClick={() => setSearch({ category: c.slug })}
-            >
-              {c.name}
-            </FilterChip>
-          ))}
-        </div>
-
-        <div className="flex flex-wrap items-center gap-2">
           <span className="label-mono mr-2 text-muted-ink">Size</span>
           <FilterChip active={!search.size} onClick={() => setSearch({ size: undefined })}>
             Any
           </FilterChip>
-          {allSizes(products).map((s) => (
+          {standardSizes.map((s) => (
             <FilterChip
               key={s}
               active={search.size === s}

@@ -2,6 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import type { Database } from "@/integrations/supabase/types";
+import { formatINR } from "@/lib/format";
 
 export type OrderStatus = Database["public"]["Enums"]["order_status"];
 
@@ -61,6 +62,7 @@ const placeOrderInput = z.object({
   pincode: z.string().min(4).max(12),
   paymentMethod: z.literal("cod"),
   notes: z.string().max(500).default(""),
+  couponCode: z.string().trim().max(40).optional(),
   reservationToken: z.string().uuid().optional(),
   items: z
     .array(
@@ -73,6 +75,47 @@ const placeOrderInput = z.object({
     .min(1)
     .max(30),
 });
+
+async function getApplicableCoupon(code: string, subtotal: number) {
+  const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+  const normalizedCode = code.trim().toUpperCase();
+  const { data: coupon, error } = await supabaseAdmin
+    .from("coupons")
+    .select("*")
+    .eq("code", normalizedCode)
+    .maybeSingle();
+  if (error) throw new Error(error.message);
+  if (!coupon || !coupon.is_active) throw new Error("This coupon code is invalid or inactive.");
+
+  const now = Date.now();
+  if (coupon.starts_at && new Date(coupon.starts_at).getTime() > now) {
+    throw new Error("This coupon is not active yet.");
+  }
+  if (coupon.expires_at && new Date(coupon.expires_at).getTime() < now) {
+    throw new Error("This coupon has expired.");
+  }
+  if (coupon.usage_limit != null && coupon.usage_count >= coupon.usage_limit) {
+    throw new Error("This coupon has reached its usage limit.");
+  }
+  if (subtotal < Number(coupon.minimum_order_amount)) {
+    throw new Error(`Add items worth ${formatINR(Number(coupon.minimum_order_amount) - subtotal)} more to use this coupon.`);
+  }
+
+  let discount = coupon.discount_type === "percentage"
+    ? subtotal * Number(coupon.discount_value) / 100
+    : Number(coupon.discount_value);
+  if (coupon.maximum_discount != null) discount = Math.min(discount, Number(coupon.maximum_discount));
+  const discountAmount = Math.min(subtotal, Math.round(discount));
+  if (discountAmount <= 0) throw new Error("This coupon does not apply a discount to this order.");
+  return { coupon, code: coupon.code, discountAmount };
+}
+
+export const validateCheckoutCoupon = createServerFn({ method: "POST" })
+  .inputValidator(z.object({ code: z.string().trim().min(2).max(40), subtotal: z.number().int().min(0) }))
+  .handler(async ({ data }) => {
+    const result = await getApplicableCoupon(data.code, data.subtotal);
+    return { code: result.code, discountAmount: result.discountAmount };
+  });
 
 
 /** Public: places a Cash-on-Delivery order. Prices are re-read server-side. */
@@ -114,8 +157,11 @@ export const placeOrder = createServerFn({ method: "POST" })
     });
 
     const subtotal = lines.reduce((sum, l) => sum + l.unit_price * l.qty, 0);
+    const appliedCoupon = data.couponCode
+      ? await getApplicableCoupon(data.couponCode, subtotal)
+      : null;
     const shipping = subtotal >= freeShippingThreshold ? 0 : shippingFee;
-    const total = subtotal + shipping + codFee;
+    const total = subtotal - (appliedCoupon?.discountAmount ?? 0) + shipping + codFee;
 
     // Link the order to the signed-in shopper when a valid session is present.
     let userId: string | null = null;
@@ -191,6 +237,51 @@ export const placeOrder = createServerFn({ method: "POST" })
       await supabaseAdmin.from("order_items").delete().eq("order_id", order.id);
       await supabaseAdmin.from("orders").delete().eq("id", order.id);
       throw err instanceof Error ? err : new Error("Stock is no longer available");
+    }
+
+    if (appliedCoupon) {
+      let usageCount = appliedCoupon.coupon.usage_count;
+      let usageError: Error | null = null;
+      let redeemed = false;
+      for (let attempt = 0; attempt < 3 && !redeemed; attempt += 1) {
+        const result = await supabaseAdmin
+          .from("coupons")
+          .update({ usage_count: usageCount + 1 })
+          .eq("id", appliedCoupon.coupon.id)
+          .eq("usage_count", usageCount)
+          .eq("is_active", true)
+          .select("id")
+          .maybeSingle();
+        if (result.error) {
+          usageError = new Error(result.error.message);
+          break;
+        }
+        if (result.data) {
+          redeemed = true;
+          break;
+        }
+        const latest = await supabaseAdmin
+          .from("coupons")
+          .select("usage_count, usage_limit, is_active")
+          .eq("id", appliedCoupon.coupon.id)
+          .maybeSingle();
+        if (latest.error) {
+          usageError = new Error(latest.error.message);
+          break;
+        }
+        if (
+          !latest.data ||
+          !latest.data.is_active ||
+          (latest.data.usage_limit != null && latest.data.usage_count >= latest.data.usage_limit)
+        ) break;
+        usageCount = latest.data.usage_count;
+      }
+      if (usageError || !redeemed) {
+        await rpc.rpc("restore_order_stock", { _order_id: order.id });
+        await supabaseAdmin.from("order_items").delete().eq("order_id", order.id);
+        await supabaseAdmin.from("orders").delete().eq("id", order.id);
+        throw new Error(usageError?.message ?? "This coupon was just used up. Try another code.");
+      }
     }
 
     return {
@@ -363,6 +454,28 @@ export const deleteOrder = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context, data: id }) => {
     await requireAdmin(context);
+    const { data: order, error: orderError } = await context.supabase
+      .from("orders")
+      .select("id, status, stock_restored")
+      .eq("id", id)
+      .maybeSingle();
+    if (orderError) throw new Error(orderError.message);
+    if (!order) return { ok: true };
+
+    // Deleting an order returns its stock unless it was already restored.
+    if (!order.stock_restored) {
+      const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+      const { error: restoreError } = await (
+        supabaseAdmin as unknown as {
+          rpc: (
+            fn: string,
+            args: Record<string, unknown>,
+          ) => Promise<{ error: { message: string } | null }>;
+        }
+      ).rpc("restore_order_stock", { _order_id: id });
+      if (restoreError) throw new Error(restoreError.message);
+    }
+
     const { error } = await context.supabase.from("orders").delete().eq("id", id);
     if (error) throw new Error(error.message);
     return { ok: true };

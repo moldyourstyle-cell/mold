@@ -38,10 +38,10 @@ function InventoryPage() {
   const filtered = rows.filter(({ product, status }) =>
     (category === "all" || product.category === category) &&
     (stockStatus === "all" || status === stockStatus) &&
-    (size === "all" || product.sizes.includes(size)) &&
+    (size === "all" || product.sizes.some((productSize) => productSize.toUpperCase() === size)) &&
     (!productSearch || `${product.name} ${product.sku}`.toLowerCase().includes(productSearch.toLowerCase()))
   );
-  const allSizes = [...new Set(data?.products.flatMap((product) => product.sizes) ?? [])].sort();
+  const standardSizes = ["XS", "S", "M", "L", "XL", "XXL", "XXXL"];
 
   return (
     <AdminPageShell title="Inventory">
@@ -53,7 +53,7 @@ function InventoryPage() {
           <label className="label-mono text-muted-ink">Search product<input value={productSearch} onChange={(event) => setProductSearch(event.target.value)} placeholder="Name or SKU" className="mt-1 block w-full border border-line bg-transparent px-3 py-2.5 text-sm text-ink" /></label>
           <Filter label="Category" value={category} onChange={setCategory} options={["all", ...new Set(data?.products.map((p) => p.category) ?? [])]} />
           <Filter label="Stock status" value={stockStatus} onChange={setStockStatus} options={["all", "In Stock", "Low Stock", "Out of Stock"]} />
-          <Filter label="Size" value={size} onChange={setSize} options={["all", ...allSizes]} />
+          <Filter label="Size" value={size} onChange={setSize} options={["all", ...standardSizes]} />
         </div>
         {isLoading ? <p className="label-mono text-muted-ink">Loading inventory…</p> : error ? <p className="text-sm text-red-600">{error.message}</p> : (
           <div className="overflow-x-auto border border-line"><table className="w-full min-w-[850px] text-left text-sm"><thead className="bg-muted/50"><tr>{["Product", "SKU", "Category", "Size", "Available stock", "Sold quantity", "Stock status", "Updated"].map((heading) => <th key={heading} className="px-3 py-3 label-mono text-muted-ink">{heading}</th>)}</tr></thead><tbody>

@@ -72,7 +72,6 @@ function ProductFormPage() {
 
   const [form, setForm] = useState<FormState>(empty);
   const [imageInput, setImageInput] = useState("");
-  const [sizeInput, setSizeInput] = useState("");
   const [tagInput, setTagInput] = useState("");
   const [message, setMessage] = useState("");
   const [uploading, setUploading] = useState(false);
@@ -181,7 +180,14 @@ function ProductFormPage() {
             <input
               required
               value={form.name}
-              onChange={(e) => update("name", e.target.value)}
+              onChange={(e) => {
+                const name = e.target.value;
+                setForm((current) => ({
+                  ...current,
+                  name,
+                  ...(isNew ? { slug: name.trim().toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "") } : {}),
+                }));
+              }}
               className="mt-2 w-full border border-line bg-transparent px-3 py-3 text-sm outline-none focus:border-ink"
             />
           </label>
@@ -216,7 +222,7 @@ function ProductFormPage() {
               required
               type="number"
               min={0}
-              value={form.price}
+              value={form.price || ""}
               onChange={(e) => update("price", Number(e.target.value))}
               className="mt-2 w-full border border-line bg-transparent px-3 py-3 text-sm outline-none focus:border-ink"
             />
@@ -386,40 +392,28 @@ function ProductFormPage() {
 
         <div className="space-y-2">
           <span className="label-mono text-muted-ink">Sizes</span>
-          <div className="flex gap-2">
-            <input
-              value={sizeInput}
-              onChange={(e) => setSizeInput(e.target.value)}
-              placeholder="S, M, L..."
-              className="flex-1 border border-line bg-transparent px-3 py-3 text-sm outline-none focus:border-ink"
-            />
-            <button
-              type="button"
-              onClick={() => {
-                addItem(form.sizes, sizeInput, (next) => update("sizes", next));
-                setSizeInput("");
-              }}
-              className="border border-line px-4 py-3 text-sm hover:bg-muted"
-            >
-              Add
-            </button>
-          </div>
           <div className="flex flex-wrap gap-2">
-            {form.sizes.map((s) => (
-              <span
-                key={s}
-                className="flex items-center gap-2 rounded bg-muted px-2 py-1 text-xs"
-              >
-                {s}
+            {["XS", "S", "M", "L", "XL", "XXL", "XXXL"].map((size) => {
+              const selected = form.sizes.includes(size);
+              return (
                 <button
+                  key={size}
                   type="button"
-                  onClick={() => removeItem(form.sizes, s, (next) => update("sizes", next))}
-                  className="text-red-600"
+                  aria-pressed={selected}
+                  onClick={() => {
+                    const next = selected
+                      ? form.sizes.filter((current) => current !== size)
+                      : [...form.sizes, size];
+                    update("sizes", next);
+                  }}
+                  className={`min-w-12 border px-4 py-3 text-sm transition-colors ${
+                    selected ? "border-ink bg-ink text-paper" : "border-line hover:border-ink"
+                  }`}
                 >
-                  ×
+                  {size}
                 </button>
-              </span>
-            ))}
+              );
+            })}
           </div>
         </div>
 

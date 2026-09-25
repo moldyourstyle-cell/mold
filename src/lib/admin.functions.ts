@@ -3,6 +3,7 @@ import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import type { Database } from "@/integrations/supabase/types";
 import type { Product } from "@/data/products";
+import { rowToProduct } from "@/lib/catalog.functions";
 
 const productInput = z.object({
   slug: z.string().min(1),
@@ -22,6 +23,14 @@ const productInput = z.object({
   isClearanceSale: z.boolean().default(false),
   isPublished: z.boolean().default(true),
 });
+
+function uniqueProductSlug(value: string, taken: Set<string>) {
+  const base = value.trim().toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "") || "product";
+  let slug = base;
+  let suffix = 2;
+  while (taken.has(slug)) slug = `${base}-${suffix++}`;
+  return slug;
+}
 
 async function requireAdmin(context: {
   supabase: ReturnType<typeof import("@supabase/supabase-js").createClient<Database>>;
@@ -82,7 +91,7 @@ export const listAdminProducts = createServerFn({ method: "GET" })
       .select("*")
       .order("created_at", { ascending: false });
     if (error) throw new Error(error.message);
-    return (data ?? []) as unknown as Product[];
+    return (data ?? []).map((row) => rowToProduct(row));
   });
 
 export const getAdminProduct = createServerFn({ method: "GET" })
@@ -92,7 +101,7 @@ export const getAdminProduct = createServerFn({ method: "GET" })
     await requireAdmin(context);
     const { data, error } = await context.supabase.from("products").select("*").eq("id", id).single();
     if (error) throw new Error(error.message);
-    return data as unknown as Product;
+    return rowToProduct(data);
   });
 
 export const createProduct = createServerFn({ method: "POST" })
@@ -100,10 +109,13 @@ export const createProduct = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context, data }) => {
     await requireAdmin(context);
+    const { data: slugRows, error: slugError } = await context.supabase.from("products").select("slug");
+    if (slugError) throw new Error(slugError.message);
+    const slug = uniqueProductSlug(data.slug || data.name, new Set((slugRows ?? []).map((row) => row.slug)));
     const { data: inserted, error } = await context.supabase
       .from("products")
       .insert({
-        slug: data.slug,
+        slug,
         name: data.name,
         category: data.category,
         price: data.price,
@@ -136,10 +148,14 @@ export const updateProduct = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context, data }) => {
     await requireAdmin(context);
+    const { data: slugRows, error: slugError } = await context.supabase.from("products").select("id, slug");
+    if (slugError) throw new Error(slugError.message);
+    const takenSlugs = new Set((slugRows ?? []).filter((row) => row.id !== data.id).map((row) => row.slug));
+    const slug = uniqueProductSlug(data.values.slug || data.values.name, takenSlugs);
     const { data: updated, error } = await context.supabase
       .from("products")
       .update({
-        slug: data.values.slug,
+        slug,
         name: data.values.name,
         category: data.values.category,
         price: data.values.price,

@@ -6,6 +6,7 @@ import {
   useRouter,
   HeadContent,
   Scripts,
+  useRouterState,
 } from "@tanstack/react-router";
 import { useEffect, type ReactNode } from "react";
 
@@ -18,6 +19,7 @@ import { AnnouncementBar } from "@/components/AnnouncementBar";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { CartDrawer } from "@/components/CartDrawer";
+import { ArrowLeft } from "lucide-react";
 
 
 function NotFoundComponent() {
@@ -147,6 +149,7 @@ function RootComponent() {
 
 function Shell() {
   const router = useRouter();
+  const pathname = useRouterState({ select: (state) => state.location.pathname });
   const queryClient = useQueryClient();
   const products = useCatalog();
 
@@ -164,6 +167,27 @@ function Shell() {
       <AnnouncementBar />
       <Header />
       <main className="min-h-[50vh]">
+        {pathname !== "/" && pathname !== "/lookbook" && !pathname.startsWith("/admin") && (
+          <div className="mx-auto flex h-0 max-w-[1500px] justify-end px-4 sm:px-6">
+            <button
+              type="button"
+              aria-label={pathname.startsWith("/product/") ? "Return to previous page" : "Return to main page"}
+              title={pathname.startsWith("/product/") ? "Return to previous page" : "Return to main page"}
+              onClick={() => {
+                if (pathname.startsWith("/product/")) {
+                  if (typeof window !== "undefined" && window.history.length > 1) window.history.back();
+                  else router.navigate({ to: "/shop" });
+                } else {
+                  router.navigate({ to: "/" });
+                }
+              }}
+              className="relative top-3 z-10 flex h-10 items-center gap-2 border border-line bg-paper px-3 text-[10px] font-semibold uppercase tracking-[0.14em] transition-colors hover:bg-ink hover:text-paper"
+            >
+              <ArrowLeft className="h-4 w-4" />
+              <span>Back</span>
+            </button>
+          </div>
+        )}
         {/* Required: nested routes render here. */}
         <Outlet />
       </main>
@@ -172,4 +196,3 @@ function Shell() {
     </StoreProvider>
   );
 }
-

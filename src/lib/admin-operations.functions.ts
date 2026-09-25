@@ -141,6 +141,22 @@ export const getStoreSettings = createServerFn({ method: "GET" })
     return data;
   });
 
+/** Public checkout rates; exposes only the amounts needed to price an order. */
+export const getCheckoutPricing = createServerFn({ method: "GET" }).handler(async () => {
+  const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+  const { data, error } = await supabaseAdmin
+    .from("store_settings")
+    .select("shipping_fee, free_shipping_threshold, cod_fee")
+    .eq("id", true)
+    .maybeSingle();
+  if (error) throw new Error(error.message);
+  return {
+    shippingFee: data?.shipping_fee ?? 99,
+    freeShippingThreshold: data?.free_shipping_threshold ?? 1999,
+    codFee: data?.cod_fee ?? 49,
+  };
+});
+
 const settingsInput = z.object({
   storeName: z.string().trim().min(1).max(100),
   storeEmail: z.string().trim().email().max(200),
