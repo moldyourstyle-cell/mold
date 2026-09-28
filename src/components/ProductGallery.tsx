@@ -22,15 +22,15 @@ export function ProductGallery({ images, name }: { images: string[]; name: strin
             onClick={() => setActive(i)}
             aria-label={`View image ${i + 1}`}
             aria-current={i === activeIndex ? "true" : undefined}
-            className={`aspect-[4/5] w-16 shrink-0 overflow-hidden border lg:w-full ${
+            className={`aspect-[295/443] w-16 shrink-0 overflow-hidden border lg:w-full ${
               i === activeIndex ? "border-ink" : "border-transparent"
             }`}
           >
             <img
               src={src}
               alt=""
-              width={200}
-              height={250}
+              width={295}
+              height={443}
               loading="lazy"
               className="h-full w-full object-cover"
             />
@@ -47,7 +47,7 @@ export function ProductGallery({ images, name }: { images: string[]; name: strin
             width={1024}
             height={1280}
             fetchPriority="high"
-            className="aspect-[4/5] w-full object-cover"
+            className="aspect-[295/443] w-full object-cover"
           />
         )}
 

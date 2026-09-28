@@ -9,6 +9,9 @@ import {
 } from "react";
 import { type Product } from "@/data/products";
 import { site } from "@/config/site";
+import { useQuery } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
+import { getCheckoutPricing } from "@/lib/admin-operations.functions";
 
 export type CartLine = {
   productId: string;
@@ -30,6 +33,7 @@ type StoreValue = {
   subtotal: number;
   shipping: number;
   total: number;
+  freeShippingThreshold: number;
   detailedLines: { line: CartLine; product: Product }[];
 };
 
@@ -52,6 +56,13 @@ export function StoreProvider({
   children: ReactNode;
   products: Product[];
 }) {
+  const loadCheckoutPricing = useServerFn(getCheckoutPricing);
+  const { data: checkoutPricing } = useQuery({
+    queryKey: ["checkout-pricing"],
+    queryFn: () => loadCheckoutPricing(),
+  });
+  const shippingFee = checkoutPricing?.shippingFee ?? site.shippingFee;
+  const freeShippingThreshold = checkoutPricing?.freeShippingThreshold ?? site.freeShippingThreshold;
 
   const [lines, setLines] = useState<CartLine[]>([]);
   const [wishlist, setWishlist] = useState<string[]>([]);
@@ -80,26 +91,50 @@ export function StoreProvider({
 
   const addToCart = useCallback((productId: string, size: string, qty = 1) => {
     setLines((prev) => {
+      const product = products.find((item) => item.id === productId);
+      if (!product || product.stock <= 0) return prev;
+
       const found = prev.find((l) => l.productId === productId && l.size === size);
+      const otherQty = prev
+        .filter((l) => l.productId === productId && l.size !== size)
+        .reduce((sum, line) => sum + line.qty, 0);
+      const available = Math.max(0, Math.min(10, product.stock - otherQty));
       if (found) {
+        const nextQty = Math.min(found.qty + qty, available);
+        if (nextQty <= found.qty) return prev;
         return prev.map((l) =>
-          l === found ? { ...l, qty: Math.min(l.qty + qty, 10) } : l,
+          l === found ? { ...l, qty: nextQty } : l,
         );
       }
-      return [...prev, { productId, size, qty }];
+      const nextQty = Math.min(qty, available);
+      if (nextQty <= 0) return prev;
+      return [...prev, { productId, size, qty: nextQty }];
     });
     setCartOpen(true);
-  }, []);
+  }, [products]);
 
   const setQty = useCallback((productId: string, size: string, qty: number) => {
-    setLines((prev) =>
-      qty <= 0
-        ? prev.filter((l) => !(l.productId === productId && l.size === size))
-        : prev.map((l) =>
-            l.productId === productId && l.size === size ? { ...l, qty } : l,
-          ),
-    );
-  }, []);
+    setLines((prev) => {
+      if (qty <= 0) {
+        return prev.filter((l) => !(l.productId === productId && l.size === size));
+      }
+
+      const product = products.find((item) => item.id === productId);
+      if (!product) return prev;
+      const otherQty = prev
+        .filter((l) => l.productId === productId && l.size !== size)
+        .reduce((sum, line) => sum + line.qty, 0);
+      const available = Math.max(0, Math.min(20, product.stock - otherQty));
+      if (available <= 0) {
+        return prev.filter((l) => !(l.productId === productId && l.size === size));
+      }
+      return prev.map((line) =>
+        line.productId === productId && line.size === size
+          ? { ...line, qty: Math.min(qty, available) }
+          : line,
+      );
+    });
+  }, [products]);
 
   const removeLine = useCallback((productId: string, size: string) => {
     setLines((prev) =>
@@ -128,7 +163,7 @@ export function StoreProvider({
       0,
     );
     const shipping =
-      subtotal === 0 || subtotal >= site.freeShippingThreshold ? 0 : site.shippingFee;
+      subtotal === 0 || subtotal >= freeShippingThreshold ? 0 : shippingFee;
 
     return {
       lines,
@@ -144,9 +179,10 @@ export function StoreProvider({
       subtotal,
       shipping,
       total: subtotal + shipping,
+      freeShippingThreshold,
       detailedLines,
     };
-  }, [lines, wishlist, cartOpen, products, addToCart, setQty, removeLine, toggleWishlist]);
+  }, [lines, wishlist, cartOpen, products, addToCart, setQty, removeLine, toggleWishlist, shippingFee, freeShippingThreshold]);
 
   return <StoreContext.Provider value={value}>{children}</StoreContext.Provider>;
 }
@@ -165,6 +201,7 @@ const emptyStore: StoreValue = {
   subtotal: 0,
   shipping: 0,
   total: 0,
+  freeShippingThreshold: site.freeShippingThreshold,
   detailedLines: [],
 };
 

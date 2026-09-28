@@ -3,7 +3,7 @@ export const site = {
   tagline: "Premium streetwear built in Chennai.",
   city: "Chennai, Tamil Nadu",
   instagram: "https://www.instagram.com/_mold._",
-  whatsapp: "https://wa.me/919840966503",
+  whatsapp: "https://chat.whatsapp.com/ERHpn9x9MMz5N6IaYbMFwB?s=sw&p=i&mlu=4&ilr=4",
   freeShippingThreshold: 1999,
   shippingFee: 99,
   announcements: [

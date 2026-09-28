@@ -5,10 +5,9 @@ import { X } from "lucide-react";
 import { useStore } from "@/lib/store";
 import { formatINR } from "@/lib/format";
 import { reserveItems } from "@/lib/reservation";
-import { site } from "@/config/site";
 
 export function CartDrawer() {
-  const { cartOpen, setCartOpen, detailedLines, subtotal, shipping, total, setQty, removeLine } =
+  const { cartOpen, setCartOpen, detailedLines, subtotal, shipping, total, freeShippingThreshold, setQty, removeLine } =
     useStore();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
@@ -38,21 +37,21 @@ export function CartDrawer() {
     }
   }
 
-  const remaining = site.freeShippingThreshold - subtotal;
+  const remaining = freeShippingThreshold - subtotal;
 
 
   return (
     <>
       <div
         onClick={() => setCartOpen(false)}
-        className={`fixed inset-0 z-50 bg-ink/50 transition-opacity duration-300 ${
+        className={`fixed inset-0 z-[80] bg-transparent transition-opacity duration-300 ${
           cartOpen ? "opacity-100" : "pointer-events-none opacity-0"
         }`}
         aria-hidden
       />
       <aside
         aria-label="Cart"
-        className={`fixed right-0 top-0 z-50 flex h-full w-full max-w-md flex-col bg-paper transition-transform duration-300 ${
+        className={`fixed right-0 top-0 z-[80] flex h-full w-full max-w-md flex-col bg-paper transition-transform duration-300 ${
           cartOpen ? "translate-x-0" : "translate-x-full"
         }`}
       >
@@ -65,7 +64,7 @@ export function CartDrawer() {
 
         <div className="label-mono border-b border-line px-5 py-3 text-muted-ink">
           {subtotal === 0
-            ? `Free shipping unlocked at ${formatINR(site.freeShippingThreshold)}`
+            ? `Free shipping unlocked at ${formatINR(freeShippingThreshold)}`
             : remaining > 0
               ? `${formatINR(remaining)} away from free shipping`
               : "Free shipping unlocked"}
@@ -108,7 +107,8 @@ export function CartDrawer() {
                       <span className="label-mono w-6 text-center">{line.qty}</span>
                       <button
                         aria-label="Increase quantity"
-                        className="px-2.5 py-1"
+                        disabled={detailedLines.reduce((sum, entry) => sum + (entry.product.id === product.id ? entry.line.qty : 0), 0) >= product.stock}
+                        className="px-2.5 py-1 disabled:cursor-not-allowed disabled:opacity-40"
                         onClick={() => setQty(line.productId, line.size, line.qty + 1)}
                       >
                         +

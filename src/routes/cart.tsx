@@ -4,7 +4,6 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useStore } from "@/lib/store";
 import { formatINR } from "@/lib/format";
 import { reserveItems } from "@/lib/reservation";
-import { site } from "@/config/site";
 
 
 export const Route = createFileRoute("/cart")({
@@ -23,8 +22,8 @@ export const Route = createFileRoute("/cart")({
 });
 
 function CartPage() {
-  const { detailedLines, subtotal, shipping, total, setQty, removeLine } = useStore();
-  const remaining = site.freeShippingThreshold - subtotal;
+  const { detailedLines, subtotal, shipping, total, freeShippingThreshold, setQty, removeLine } = useStore();
+  const remaining = freeShippingThreshold - subtotal;
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [reserving, setReserving] = useState(false);
@@ -108,7 +107,8 @@ function CartPage() {
                       <span className="label-mono w-7 text-center">{line.qty}</span>
                       <button
                         aria-label="Increase quantity"
-                        className="px-3 py-1.5"
+                        disabled={detailedLines.reduce((sum, entry) => sum + (entry.product.id === product.id ? entry.line.qty : 0), 0) >= product.stock}
+                        className="px-3 py-1.5 disabled:cursor-not-allowed disabled:opacity-40"
                         onClick={() => setQty(line.productId, line.size, line.qty + 1)}
                       >
                         +
@@ -142,7 +142,7 @@ function CartPage() {
             </div>
             <p className="label-mono mt-4 text-muted-ink">
               {remaining > 0
-                ? `Free shipping unlocked at ${formatINR(site.freeShippingThreshold)}`
+                ? `Free shipping unlocked at ${formatINR(freeShippingThreshold)}`
                 : "Free shipping unlocked"}
             </p>
             <button

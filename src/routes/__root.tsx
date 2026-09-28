@@ -8,7 +8,8 @@ import {
   Scripts,
   useRouterState,
 } from "@tanstack/react-router";
-import { useEffect, type ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
+import { createPortal } from "react-dom";
 
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
@@ -19,7 +20,8 @@ import { AnnouncementBar } from "@/components/AnnouncementBar";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { CartDrawer } from "@/components/CartDrawer";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, MessageCircle, Phone, X } from "lucide-react";
+import { useStore } from "@/lib/store";
 
 
 function NotFoundComponent() {
@@ -192,7 +194,55 @@ function Shell() {
         <Outlet />
       </main>
       <Footer />
+      <FloatingWhatsApp />
       <CartDrawer />
     </StoreProvider>
+  );
+}
+
+function FloatingWhatsApp() {
+  const { cartOpen } = useStore();
+  const [mounted, setMounted] = useState(false);
+  const [expanded, setExpanded] = useState(false);
+
+  useEffect(() => setMounted(true), []);
+  if (!mounted || cartOpen) return null;
+
+  return createPortal(
+    expanded ? (
+      <div className="fixed bottom-5 right-5 z-[9999] flex items-center gap-2">
+        <a
+          href="https://chat.whatsapp.com/ERHpn9x9MMz5N6IaYbMFwB?s=sw&p=i&mlu=4&ilr=4"
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label="Join our WhatsApp group"
+          title="Join our WhatsApp group"
+          className="relative grid size-14 touch-manipulation place-items-center rounded-full bg-[#25D366] text-white shadow-lg focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#25D366]"
+        >
+          <MessageCircle className="size-7" aria-hidden="true" />
+          <Phone className="absolute size-3 fill-white stroke-[#25D366] stroke-[3px]" aria-hidden="true" />
+        </a>
+        <button
+          type="button"
+          onClick={() => setExpanded(false)}
+          aria-label="Hide WhatsApp link"
+          className="grid size-8 place-items-center rounded-full bg-paper text-ink shadow-lg"
+        >
+          <X className="size-4" aria-hidden="true" />
+        </button>
+      </div>
+    ) : (
+      <button
+        type="button"
+        onClick={() => setExpanded(true)}
+        aria-label="Show WhatsApp link"
+        aria-expanded={false}
+        className="fixed bottom-5 right-0 z-[9999] grid size-12 translate-x-1/2 touch-manipulation place-items-center rounded-l-full bg-[#25D366] text-white shadow-lg"
+      >
+        <MessageCircle className="size-6 -translate-x-2" aria-hidden="true" />
+        <Phone className="absolute size-3 -translate-x-2 fill-white stroke-[#25D366] stroke-[3px]" aria-hidden="true" />
+      </button>
+    ),
+    document.body,
   );
 }

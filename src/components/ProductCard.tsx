@@ -1,18 +1,46 @@
 import { Link } from "@tanstack/react-router";
+import { useEffect, useRef, useState } from "react";
 import { Heart } from "lucide-react";
 import { discountPercent, type Product } from "@/data/products";
 import { formatINR } from "@/lib/format";
 import { useStore } from "@/lib/store";
 
 export function ProductCard({ product, priority }: { product: Product; priority?: boolean }) {
+  const cardRef = useRef<HTMLElement>(null);
+  const [visible, setVisible] = useState(false);
   const { addToCart, toggleWishlist, wishlist } = useStore();
   const off = discountPercent(product);
   const wished = wishlist.includes(product.id);
   const soldOut = product.stock === 0;
 
+  useEffect(() => {
+    const card = cardRef.current;
+    if (!card) return;
+    if (!("IntersectionObserver" in window)) {
+      setVisible(true);
+      return;
+    }
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (!entry?.isIntersecting) return;
+        setVisible(true);
+        observer.disconnect();
+      },
+      { rootMargin: "0px 0px -6% 0px", threshold: 0.08 },
+    );
+    observer.observe(card);
+    return () => observer.disconnect();
+  }, []);
+
   return (
-    <article className="group">
-      <div className="relative aspect-square overflow-hidden bg-secondary">
+    <article
+      ref={cardRef}
+      className={`group transition-[opacity,transform] duration-700 ease-out motion-reduce:translate-y-0 motion-reduce:opacity-100 motion-reduce:transition-none ${
+        visible ? "translate-y-0 opacity-100" : "translate-y-5 opacity-0"
+      }`}
+    >
+      <div className="relative aspect-[295/443] overflow-hidden bg-secondary">
         <Link
           to="/product/$slug"
           params={{ slug: product.slug }}

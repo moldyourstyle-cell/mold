@@ -23,7 +23,7 @@ export function HeroCarousel({ content }: { content: HeroContent }) {
   const slide = slides[Math.min(index, slides.length - 1)]!;
 
   return (
-    <section className="relative aspect-[4/5] min-h-[540px] w-full overflow-hidden bg-ink text-paper sm:aspect-[4/3] sm:min-h-[580px] md:aspect-[3/2] md:min-h-[620px] xl:aspect-[2/1]">
+    <section className="relative aspect-[966/362] w-full overflow-hidden bg-ink text-paper">
       {slides.map((item, i) => (
         <div
           key={`${item.image}-${i}`}
@@ -44,28 +44,27 @@ export function HeroCarousel({ content }: { content: HeroContent }) {
       ))}
 
       <div className="absolute inset-0 bg-gradient-to-t from-ink via-ink/25 to-transparent" />
-      <div className="absolute inset-0 mx-auto flex max-w-[1500px] flex-col justify-end px-4 pb-5 pt-14 sm:px-6 sm:pb-8 sm:pt-24">
+      <div className="absolute inset-0 mx-auto flex max-w-[1500px] flex-col justify-end px-3 pb-2 pt-2 sm:px-6 sm:pb-5 sm:pt-8 lg:pb-8">
         <div key={index} className="fade-up">
           <div className="flex items-center gap-4">
-            <span className="h-px w-10 bg-accent" />
-            <span className="label-mono text-paper/80">{slide.eyebrow}</span>
+            <span className="label-mono text-[8px] text-paper/80 sm:text-[10px]">{slide.eyebrow}</span>
           </div>
-          <h1 className="display mt-3 max-w-[11ch] break-words text-[clamp(2rem,7vw,4rem)] leading-[0.98] text-paper sm:mt-4 sm:max-w-[10ch] sm:text-[clamp(3rem,5vw,5rem)]">
+          <h1 className="display mt-1 max-w-[14ch] break-words text-[clamp(1.35rem,6vw,2.5rem)] leading-[0.9] text-paper sm:mt-2 sm:max-w-[10ch] sm:text-[clamp(2rem,4.5vw,4rem)] lg:mt-3 lg:text-[clamp(2.5rem,4vw,4rem)]">
             {slide.title}
             <span className="block text-accent">{slide.accent}</span>
           </h1>
-          <div className="mt-5 border-t border-paper/30 pt-4 sm:mt-6 sm:pt-5">
-            <p className="max-w-[52ch] text-sm leading-relaxed text-paper/80">{slide.description}</p>
-            <div className="mt-4 flex flex-wrap gap-2 sm:gap-3">
+          <div className="mt-2 pt-0 sm:mt-3 md:mt-4 lg:mt-4">
+            <p className="hidden max-w-[52ch] text-sm leading-relaxed text-paper/80 md:block">{slide.description}</p>
+            <div className="mt-1 flex flex-wrap gap-1.5 sm:mt-3 sm:gap-3 lg:mt-3">
               <a
                 href={slide.primaryHref}
-                className="inline-flex min-h-11 w-fit items-center justify-center bg-accent px-5 py-3 text-[10px] font-semibold uppercase tracking-[0.12em] text-ink transition-colors hover:bg-paper sm:px-6 sm:py-3 sm:text-[11px] sm:tracking-[0.14em]"
+                className="inline-flex min-h-8 w-fit items-center justify-center bg-accent px-3 py-1.5 text-[8px] font-semibold uppercase tracking-[0.08em] text-ink transition-colors hover:bg-paper sm:min-h-10 sm:px-5 sm:py-2 sm:text-[10px] sm:tracking-[0.12em] lg:min-h-10 lg:px-5 lg:py-2"
               >
                 {slide.primaryLabel}
               </a>
               <a
                 href={slide.secondaryHref}
-                className="inline-flex min-h-11 w-fit items-center justify-center border border-paper/60 px-5 py-3 text-[10px] font-semibold uppercase tracking-[0.12em] text-paper transition-colors hover:bg-paper hover:text-ink sm:px-6 sm:py-3 sm:text-[11px] sm:tracking-[0.14em]"
+                className="inline-flex min-h-8 w-fit items-center justify-center border border-paper/60 px-3 py-1.5 text-[8px] font-semibold uppercase tracking-[0.08em] text-paper transition-colors hover:bg-paper hover:text-ink sm:min-h-10 sm:px-5 sm:py-2 sm:text-[10px] sm:tracking-[0.12em] lg:min-h-10 lg:px-5 lg:py-2"
               >
                 {slide.secondaryLabel}
               </a>
@@ -74,7 +73,7 @@ export function HeroCarousel({ content }: { content: HeroContent }) {
         </div>
 
         {slides.length > 1 && (
-          <div className="mt-8 flex items-center gap-3">
+          <div className="mt-2 flex items-center gap-2 sm:mt-4 sm:gap-3">
             {slides.map((item, i) => (
               <button
                 key={`dot-${item.image}-${i}`}

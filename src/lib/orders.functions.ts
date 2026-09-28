@@ -334,9 +334,13 @@ export const trackOrder = createServerFn({ method: "GET" })
     if (error) throw new Error(error.message);
     if (!order) return null;
 
-    const matches =
-      order.email.toLowerCase() === contact ||
-      order.phone.replace(/\D/g, "").endsWith(contact.replace(/\D/g, "").slice(-10));
+    const contactPhone = contact.replace(/\D/g, "");
+    const orderPhone = order.phone.replace(/\D/g, "");
+    const matchesPhone =
+      contactPhone.length >= 10 &&
+      orderPhone.length >= 10 &&
+      orderPhone.slice(-10) === contactPhone.slice(-10);
+    const matches = order.email.trim().toLowerCase() === contact || matchesPhone;
     if (!matches) return null;
 
     return {

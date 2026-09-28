@@ -181,7 +181,7 @@ function ProductPage() {
                 −
               </button>
               <span className="label-mono w-8 text-center">{qty}</span>
-              <button aria-label="Increase" className="px-4 py-3" onClick={() => setQty(Math.min(10, qty + 1))}>
+              <button aria-label="Increase" disabled={qty >= Math.min(10, product.stock)} className="px-4 py-3 disabled:cursor-not-allowed disabled:opacity-40" onClick={() => setQty(Math.min(10, product.stock, qty + 1))}>
                 +
               </button>
             </div>
