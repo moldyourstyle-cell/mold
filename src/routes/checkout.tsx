@@ -127,7 +127,13 @@ function Checkout() {
 
   if (confirmed) {
     return (
-      <div className="mx-auto max-w-[720px] px-4 py-24 text-center sm:px-6">
+      <div className="order-confirmation relative isolate mx-auto max-w-[720px] overflow-hidden px-4 py-24 text-center sm:px-6">
+        <div className="order-confetti" aria-hidden="true">
+          {Array.from({ length: 24 }, (_, index) => (
+            <span key={index} style={{ "--confetti-index": index } as React.CSSProperties} />
+          ))}
+        </div>
+        <div className="relative z-10">
         <span className="label-mono text-accent">Order received</span>
         <h1 className="display mt-4 text-[clamp(2.5rem,8vw,5rem)]">You're in.</h1>
         <p className="mt-6 text-sm text-muted-ink">
@@ -148,6 +154,7 @@ function Checkout() {
           >
             Keep shopping
           </Link>
+        </div>
         </div>
       </div>
     );

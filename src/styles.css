@@ -127,6 +127,47 @@
   }
 }
 
+@keyframes orderConfetti {
+  0% {
+    opacity: 0;
+    transform: translate3d(0, -12px, 0) rotate(0deg) scale(0.5);
+  }
+  12% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translate3d(var(--confetti-drift), 190px, 0) rotate(var(--confetti-spin)) scale(1);
+  }
+}
+
+.order-confetti {
+  position: absolute;
+  inset: 1rem 0 auto;
+  height: 13rem;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.order-confetti span {
+  --confetti-hue: calc(var(--confetti-index) * 47deg);
+  --confetti-drift: calc((var(--confetti-index) - 12) * 6px);
+  --confetti-spin: calc(var(--confetti-index) * 71deg);
+  position: absolute;
+  top: 0;
+  left: calc(4% + (var(--confetti-index) * 4%));
+  width: 7px;
+  height: 11px;
+  background: hsl(var(--confetti-hue) 78% 53%);
+  animation: orderConfetti 1.8s cubic-bezier(0.2, 0.7, 0.3, 1) calc(var(--confetti-index) * 32ms) both;
+}
+
+.order-confetti span:nth-child(3n) {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+}
+
 @utility fade-up {
   animation: fadeUp 0.5s cubic-bezier(0.32, 0.72, 0, 1) both;
 }
