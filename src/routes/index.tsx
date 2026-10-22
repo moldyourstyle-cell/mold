@@ -9,6 +9,7 @@ import { Newsletter } from "@/components/Newsletter";
 import { EditorialLookbook } from "@/components/EditorialLookbook";
 import { InstagramFeed } from "@/components/InstagramFeed";
 import { HeroCarousel } from "@/components/HeroCarousel";
+import { ProductDetailEditorial } from "@/components/ProductDetailEditorial";
 
 export const Route = createFileRoute("/")({
   loader: ({ context }) => context.queryClient.ensureQueryData(siteContentQuery),
@@ -36,7 +37,7 @@ export const Route = createFileRoute("/")({
 
 function Home() {
   const products = useCatalog();
-  const { hero, lookbook, instagram } = useSiteContent();
+  const { hero, lookbook, instagram, showcase } = useSiteContent();
   const latest = [...products]
     .sort((a, b) => Number(!!b.isNew) - Number(!!a.isNew) || b.createdAt.localeCompare(a.createdAt))
     .slice(0, 4);
@@ -66,9 +67,9 @@ function Home() {
       </section>
 
       {/* CATEGORIES */}
-      <section className="mx-auto max-w-[1500px] px-4 pb-16 sm:px-6 sm:pb-24">
+      <section className="mx-auto max-w-[1500px] px-4 pb-0 sm:px-6">
         <span className="label-mono text-muted-ink">(02) — Departments</span>
-        <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-5 md:grid-cols-4">
+        <div className="mt-6 grid grid-cols-2 gap-x-4 gap-y-10 sm:gap-6 md:grid-cols-2 md:gap-7 xl:grid-cols-4">
           {categories.map((c) => (
             <CategoryCard
               key={c.slug}
@@ -80,6 +81,8 @@ function Home() {
           ))}
         </div>
       </section>
+
+      <ProductDetailEditorial content={showcase} />
 
       <EditorialLookbook content={lookbook} compact />
       <InstagramFeed content={instagram} />

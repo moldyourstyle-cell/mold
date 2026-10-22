@@ -23,7 +23,7 @@ export function HeroCarousel({ content }: { content: HeroContent }) {
   const slide = slides[Math.min(index, slides.length - 1)]!;
 
   return (
-    <section className="relative aspect-[966/362] w-full overflow-hidden bg-ink text-paper">
+    <section className="relative aspect-[2/1] w-full overflow-hidden bg-ink text-paper sm:aspect-[966/362]">
       {slides.map((item, i) => (
         <div
           key={`${item.image}-${i}`}
@@ -49,7 +49,7 @@ export function HeroCarousel({ content }: { content: HeroContent }) {
           <div className="flex items-center gap-4">
             <span className="label-mono text-[8px] text-paper/80 sm:text-[10px]">{slide.eyebrow}</span>
           </div>
-          <h1 className="display mt-1 max-w-[14ch] break-words text-[clamp(1.35rem,6vw,2.5rem)] leading-[0.9] text-paper sm:mt-2 sm:max-w-[10ch] sm:text-[clamp(2rem,4.5vw,4rem)] lg:mt-3 lg:text-[clamp(2.5rem,4vw,4rem)]">
+          <h1 className="display mt-1 max-w-[14ch] break-words text-[clamp(1.35rem,6vw,2.5rem)] leading-[0.9] text-accent sm:mt-2 sm:max-w-[10ch] sm:text-[clamp(2rem,4.5vw,4rem)] lg:mt-3 lg:text-[clamp(2.5rem,4vw,4rem)]">
             {slide.title}
             <span className="block text-accent">{slide.accent}</span>
           </h1>

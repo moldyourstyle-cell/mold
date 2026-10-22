@@ -152,6 +152,7 @@ function RootComponent() {
 function Shell() {
   const router = useRouter();
   const pathname = useRouterState({ select: (state) => state.location.pathname });
+  const isAdminPage = pathname.startsWith("/admin");
   const queryClient = useQueryClient();
   const products = useCatalog();
 
@@ -166,8 +167,8 @@ function Shell() {
 
   return (
     <StoreProvider products={products}>
-      <AnnouncementBar />
-      <Header />
+      {!isAdminPage && <AnnouncementBar />}
+      {!isAdminPage && <Header transparentOnHome={pathname === "/"} />}
       <main className="min-h-[50vh]">
         {pathname !== "/" && pathname !== "/lookbook" && !pathname.startsWith("/admin") && (
           <div className="mx-auto flex h-0 max-w-[1500px] justify-end px-4 sm:px-6">
@@ -193,9 +194,9 @@ function Shell() {
         {/* Required: nested routes render here. */}
         <Outlet />
       </main>
-      <Footer />
-      <FloatingWhatsApp />
-      <CartDrawer />
+      {!isAdminPage && <Footer />}
+      {!isAdminPage && <FloatingWhatsApp />}
+      {!isAdminPage && <CartDrawer />}
     </StoreProvider>
   );
 }

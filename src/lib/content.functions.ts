@@ -5,7 +5,7 @@ import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import type { Database, Json } from "@/integrations/supabase/types";
 import { defaultSiteContent, type SiteContent } from "@/lib/site-content";
 
-const sectionKey = z.enum(["hero", "lookbook", "instagram"]);
+const sectionKey = z.enum(["hero", "lookbook", "instagram", "showcase"]);
 const contentInput = z.object({
   sectionKey,
   content: z.record(z.unknown()),
@@ -47,7 +47,9 @@ function mergeRows(rows: Array<{ section_key: string; content: Json }>): SiteCon
     if (row.section_key === "hero") next.hero = row.content as SiteContent["hero"];
     if (row.section_key === "lookbook") next.lookbook = row.content as SiteContent["lookbook"];
     if (row.section_key === "instagram") next.instagram = row.content as SiteContent["instagram"];
+    if (row.section_key === "showcase") next.showcase = row.content as SiteContent["showcase"];
   }
+  next.showcase = { ...defaultSiteContent.showcase, ...next.showcase };
   return next;
 }
 

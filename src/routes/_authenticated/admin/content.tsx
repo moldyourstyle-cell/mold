@@ -2,7 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
-import { ArrowDown, ArrowUp, Plus, Save, Trash2 } from "lucide-react";
+import { ArrowDown, ArrowUp, Plus, Save, Trash2, Monitor, Smartphone } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -11,7 +11,8 @@ import { getAdminSiteContent, updateSiteContent } from "@/lib/content.functions"
 import { SiteMedia } from "@/components/SiteMedia";
 import { AdminOperationsNav } from "@/components/AdminOperationsNav";
 import { ImageUploadField } from "@/components/ImageUploadField";
-import { defaultSiteContent, emptyHeroSlide, normalizeHero, type HeroSlide, type InstagramContent, type LookbookContent, type SiteContent } from "@/lib/site-content";
+import { defaultSiteContent, emptyHeroSlide, normalizeHero, type HeroSlide, type InstagramContent, type LookbookContent, type ProductFeature, type SiteContent } from "@/lib/site-content";
+import { ProductDetailEditorial } from "@/components/ProductDetailEditorial";
 
 
 export const Route = createFileRoute("/_authenticated/admin/content")({
@@ -50,7 +51,8 @@ function ContentEditor() {
   const loadContent = useServerFn(getAdminSiteContent);
   const saveContent = useServerFn(updateSiteContent);
   const [content, setContent] = useState<SiteContent>(defaultSiteContent);
-  const [published, setPublished] = useState<PublishState>({ hero: true, lookbook: true, instagram: true });
+  const [published, setPublished] = useState<PublishState>({ hero: true, lookbook: true, instagram: true, showcase: true });
+  const [previewMobile, setPreviewMobile] = useState(false);
   const [message, setMessage] = useState("");
 
   const { data: rows, isLoading } = useQuery({ queryKey: ["admin-site-content"], queryFn: () => loadContent() });
@@ -58,12 +60,13 @@ function ContentEditor() {
   useEffect(() => {
     if (!rows) return;
     const next = structuredClone(defaultSiteContent);
-    const nextPublished = { hero: true, lookbook: true, instagram: true };
+    const nextPublished = { hero: true, lookbook: true, instagram: true, showcase: true };
     for (const row of rows) {
       next[row.sectionKey] = row.content as never;
       nextPublished[row.sectionKey] = row.isPublished;
     }
     next.hero = normalizeHero(next.hero);
+    next.showcase = { ...defaultSiteContent.showcase, ...next.showcase };
     setContent(next);
     setPublished(nextPublished);
   }, [rows]);
@@ -103,7 +106,17 @@ function ContentEditor() {
   function updateInstagram<K extends keyof InstagramContent>(key: K, value: InstagramContent[K]) {
     setContent((current) => ({ ...current, instagram: { ...current.instagram, [key]: value } }));
   }
-
+  function updateFeature(index: number, update: (feature: ProductFeature) => ProductFeature) {
+    setContent((current) => ({ ...current, showcase: { ...current.showcase, features: current.showcase.features.map((item, i) => i === index ? update(item) : item) } }));
+  }
+  function moveFeature(index: number, direction: -1 | 1) {
+    const features = [...content.showcase.features];
+    const target = index + direction;
+    if (target < 0 || target >= features.length) return;
+    const [feature] = features.splice(index, 1);
+    features.splice(target, 0, feature!);
+    setContent((current) => ({ ...current, showcase: { ...current.showcase, features } }));
+  }
   function sectionHeader(key: SectionKey, title: string, description: string) {
     return (
       <div className="flex flex-col gap-5 border-b border-line pb-6 sm:flex-row sm:items-end sm:justify-between">
@@ -179,6 +192,30 @@ function ContentEditor() {
 
 
       <section className="mt-16 border-t border-line pt-8">
+        {sectionHeader("showcase", "Product editorial", "Edit the video, center image, connector and copy for the homepage feature.")}
+        <div className="mt-10 border-t border-line pt-6">
+          <span className="label-mono text-accent">Editorial composition — video, image and copy</span>
+          <div className="mt-5 grid gap-6 sm:grid-cols-2">
+            <div className="sm:col-span-2"><ImageUploadField label="Left-side video (upload a video or paste a URL)" value={content.showcase.detailVideo} folder="showcase-video" onChange={(v) => setContent((c) => ({ ...c, showcase: { ...c.showcase, detailVideo: v } }))} /></div>
+            <div className="sm:col-span-2"><ImageUploadField label="Center image" value={content.showcase.image} folder="showcase" onChange={(v) => setContent((c) => ({ ...c, showcase: { ...c.showcase, image: v } }))} /></div>
+            <div className="sm:col-span-2"><ImageUploadField label="Hover image (shown on pointer hover)" value={content.showcase.hoverImage} folder="showcase" onChange={(v) => setContent((c) => ({ ...c, showcase: { ...c.showcase, hoverImage: v } }))} /></div>
+            <div className="sm:col-span-2"><Field label="Center image alt text" value={content.showcase.imageAlt} onChange={(v) => setContent((c) => ({ ...c, showcase: { ...c.showcase, imageAlt: v } }))} /></div>
+            <Field label="Right-side heading" value={content.showcase.detailHeading} onChange={(v) => setContent((c) => ({ ...c, showcase: { ...c.showcase, detailHeading: v } }))} />
+            <div className="sm:col-span-2"><Field label="Right-side text" value={content.showcase.detailText} multiline onChange={(v) => setContent((c) => ({ ...c, showcase: { ...c.showcase, detailText: v } }))} /></div>
+          </div>
+          <div className="mt-6 flex gap-2"><Button type="button" variant={previewMobile ? "outline" : "default"} onClick={() => setPreviewMobile(false)} className="rounded-none"><Monitor /> Desktop</Button><Button type="button" variant={previewMobile ? "default" : "outline"} onClick={() => setPreviewMobile(true)} className="rounded-none"><Smartphone /> Mobile</Button></div>
+          <div className={`mt-5 border border-line p-3 sm:p-5 ${previewMobile ? "max-w-sm" : ""}`}>
+            <ProductDetailEditorial preview mobile={previewMobile} content={content.showcase} onFeaturePosition={(index, key, value) => updateFeature(index, (feature) => ({ ...feature, [previewMobile ? "mobile" : "desktop"]: { ...feature[previewMobile ? "mobile" : "desktop"], [key]: value } }))} />
+            <p className="label-mono mt-3 text-muted-ink">Drag a point or feature label on the center image to position it.</p>
+          </div>
+          <div className="mt-8 space-y-5">
+            {content.showcase.features.map((feature, index) => <div key={index} className="grid gap-4 border-t border-line pt-5 sm:grid-cols-[1fr_auto]"><div className="space-y-4"><Field label={`Image point ${index + 1} description`} value={feature.text} onChange={(v) => updateFeature(index, (current) => ({ ...current, text: v }))} /><div className="flex flex-wrap gap-5"><label className="flex items-center gap-2"><Switch checked={feature.enabled} onCheckedChange={(enabled) => updateFeature(index, (current) => ({ ...current, enabled }))} /><span className="label-mono">Enabled</span></label><label className="flex items-center gap-2"><Switch checked={feature.lineEnabled} onCheckedChange={(lineEnabled) => updateFeature(index, (current) => ({ ...current, lineEnabled }))} /><span className="label-mono">Show point line</span></label></div></div><div className="flex items-start gap-2"><Button type="button" variant="outline" size="sm" className="rounded-none" disabled={index === 0} onClick={() => moveFeature(index, -1)}><ArrowUp /></Button><Button type="button" variant="outline" size="sm" className="rounded-none" disabled={index === content.showcase.features.length - 1} onClick={() => moveFeature(index, 1)}><ArrowDown /></Button><Button type="button" variant="outline" className="rounded-none" onClick={() => setContent((c) => ({ ...c, showcase: { ...c.showcase, features: c.showcase.features.filter((_, i) => i !== index) } }))}><Trash2 /> Remove</Button></div></div>)}
+          </div>
+          <Button type="button" variant="outline" className="mt-6 rounded-none" onClick={() => setContent((c) => ({ ...c, showcase: { ...c.showcase, features: [...c.showcase.features, { text: "New product detail", enabled: true, lineEnabled: true, desktop: { x: 50, y: 50, tx: 76, ty: 50 }, mobile: { x: 50, y: 50, tx: 76, ty: 50 } }] } }))}><Plus /> Add image point</Button>
+        </div>
+      </section>
+
+      <section className="mt-16 border-t border-line pt-8">
         {sectionHeader("lookbook", "Editorial lookbook", "The campaign story and three-image editorial sequence.")}
         <div className="mt-8 grid gap-6 sm:grid-cols-2">
           <Field label="Eyebrow" value={content.lookbook.eyebrow} onChange={(v) => updateLookbook("eyebrow", v)} />
@@ -214,18 +251,18 @@ function ContentEditor() {
         <div className="mt-10 grid gap-8 sm:grid-cols-2">
           {content.instagram.posts.map((post, index) => (
             <div key={index} className="border-t border-line pt-5">
-              <SiteMedia src={post.image} alt="" className="aspect-square w-full object-cover" />
+              <SiteMedia src={post.image} alt={post.alt || post.caption} className="aspect-[4/5] w-full object-cover" />
               <div className="mt-5 space-y-4">
                 <ImageUploadField label="Post image or video" value={post.image} folder="instagram" onChange={(v) => updateInstagram("posts", content.instagram.posts.map((item, i) => i === index ? { ...item, image: v } : item))} />
                 <Field label="Caption" value={post.caption} onChange={(v) => updateInstagram("posts", content.instagram.posts.map((item, i) => i === index ? { ...item, caption: v } : item))} />
                 <Field label="Alt text" value={post.alt} onChange={(v) => updateInstagram("posts", content.instagram.posts.map((item, i) => i === index ? { ...item, alt: v } : item))} />
-                <Field label="Post URL" value={post.url} onChange={(v) => updateInstagram("posts", content.instagram.posts.map((item, i) => i === index ? { ...item, url: v } : item))} />
+                <label className="block"><span className="label-mono text-muted-ink">Direct Instagram post or reel URL</span><Input type="url" value={post.url} placeholder="https://www.instagram.com/p/... or /reel/..." onChange={(event) => updateInstagram("posts", content.instagram.posts.map((item, i) => i === index ? { ...item, url: event.target.value } : item))} className="mt-2 rounded-none" /><span className="label-mono mt-2 block text-muted-ink">Customers open this exact post or reel when they select the image.</span></label>
                 <Button type="button" variant="outline" onClick={() => updateInstagram("posts", content.instagram.posts.filter((_, i) => i !== index))} className="rounded-none"><Trash2 /> Remove post</Button>
               </div>
             </div>
           ))}
         </div>
-        <Button type="button" variant="outline" onClick={() => updateInstagram("posts", [...content.instagram.posts, { image: "/editorial/mold-hero.jpg", alt: "MOLD lifestyle image", caption: "New post", url: content.instagram.profileUrl }])} className="mt-8 rounded-none"><Plus /> Add post</Button>
+        <Button type="button" variant="outline" onClick={() => updateInstagram("posts", [...content.instagram.posts, { image: "", alt: "", caption: "", url: "" }])} className="mt-8 rounded-none"><Plus /> Add Instagram post or reel</Button>
       </section>
     </div>
   );

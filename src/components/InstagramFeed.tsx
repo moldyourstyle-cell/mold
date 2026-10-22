@@ -17,16 +17,26 @@ export function InstagramFeed({ content }: { content: InstagramContent }) {
           </a>
         </div>
         <div className="mt-10 grid grid-cols-2 gap-px bg-paper/20 lg:grid-cols-4">
-          {content.posts.map((post, index) => (
-            <a key={`${post.image}-${index}`} href={post.url} target="_blank" rel="noreferrer" className="group relative overflow-hidden bg-ink">
-              <SiteMedia src={post.image} alt={post.alt} className="aspect-[4/5] w-full object-cover transition duration-500 group-hover:scale-[1.03] group-hover:opacity-75" />
-              <div className="absolute inset-x-0 bottom-0 translate-y-full bg-ink/90 p-4 transition-transform duration-300 group-hover:translate-y-0">
-                <span className="label-mono text-paper">{post.caption}</span>
-              </div>
-            </a>
+          {content.posts.filter((post) => post.image).map((post, index) => (
+            <PostCard key={`${post.image}-${index}`} post={post} />
           ))}
         </div>
       </div>
     </section>
   );
+}
+
+function PostCard({ post }: { post: InstagramContent["posts"][number] }) {
+  let directPost = false;
+  try {
+    const url = new URL(post.url);
+    directPost = (url.hostname === "instagram.com" || url.hostname.endsWith(".instagram.com")) && /^\/(p|reel|tv)\/[^/]+/.test(url.pathname);
+  } catch {
+    directPost = false;
+  }
+  const card = <div className="group relative aspect-[4/5] overflow-hidden bg-ink">
+    <SiteMedia src={post.image} alt={post.alt || post.caption} className="absolute inset-0 h-full w-full object-cover transition duration-500 group-hover:scale-[1.03] group-hover:opacity-75" />
+    <div className="absolute inset-x-0 bottom-0 translate-y-full bg-ink/90 p-4 transition-transform duration-300 group-hover:translate-y-0"><span className="label-mono text-paper">{post.caption || "View on Instagram ↗"}</span></div>
+  </div>;
+  return directPost ? <a href={post.url} target="_blank" rel="noopener noreferrer" aria-label={`Open Instagram post: ${post.caption}`} className="block">{card}</a> : card;
 }

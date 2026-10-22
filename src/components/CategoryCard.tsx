@@ -16,7 +16,7 @@ export function CategoryCard({
     <Link
       to="/shop"
       search={{ category: slug }}
-      className="group relative block aspect-[4/5] overflow-hidden bg-secondary"
+      className="group relative block aspect-[295/443] overflow-hidden bg-secondary sm:aspect-[4/5]"
     >
       <img
         src={image}

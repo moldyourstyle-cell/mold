@@ -1,5 +1,5 @@
 import { Link, useNavigate } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Heart, Menu, Search, User, X } from "lucide-react";
 import { categories } from "@/data/products";
 import { useStore } from "@/lib/store";
@@ -15,12 +15,21 @@ const navLinks = [
   { label: "Clearance Sale", to: "/shop" as const, search: { sale: true } },
 ];
 
-export function Header() {
+export function Header({ transparentOnHome = false }: { transparentOnHome?: boolean }) {
   const { count, setCartOpen, wishlist } = useStore();
   const [menuOpen, setMenuOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const [query, setQuery] = useState("");
+  const [scrolled, setScrolled] = useState(false);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    if (!transparentOnHome) return;
+    const update = () => setScrolled(window.scrollY > 8);
+    update();
+    window.addEventListener("scroll", update, { passive: true });
+    return () => window.removeEventListener("scroll", update);
+  }, [transparentOnHome]);
 
   function submitSearch(e: React.FormEvent) {
     e.preventDefault();
@@ -31,7 +40,7 @@ export function Header() {
 
   return (
     <>
-    <header className="sticky top-0 z-[60] border-b border-line bg-paper/95 backdrop-blur-sm">
+    <header className={`sticky top-0 z-[60] ${transparentOnHome && !scrolled ? "-mb-14 border-transparent bg-transparent text-paper" : "border-b border-line bg-paper/95 text-ink backdrop-blur-sm"}`}>
       <div className="mx-auto grid h-14 max-w-[1500px] grid-cols-[auto_1fr_auto] items-center gap-4 px-4 sm:px-6">
         <div className="flex min-w-0 items-center gap-3">
           <button
@@ -93,7 +102,7 @@ export function Header() {
           </Link>
           <button
             onClick={() => setCartOpen(true)}
-            className="label-mono border border-ink px-3 py-1.5 transition-colors hover:bg-ink hover:text-paper"
+            className="label-mono border border-current px-3 py-1.5 transition-colors hover:bg-ink hover:text-paper"
           >
             Cart · {count}
           </button>

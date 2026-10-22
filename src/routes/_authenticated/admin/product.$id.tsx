@@ -132,11 +132,12 @@ function ProductFormPage() {
       return doUpdate({ data: { id, values } });
     },
 
-    onSuccess: (product) => {
-      queryClient.invalidateQueries({ queryKey: ["catalog"] });
-      queryClient.invalidateQueries({ queryKey: ["admin-products"] });
-      setMessage(isNew ? "Product created." : "Product updated.");
-      if (isNew) navigate({ to: "/admin/products" });
+      onSuccess: async () => {
+        await Promise.all([
+          queryClient.invalidateQueries({ queryKey: ["catalog"] }),
+          queryClient.invalidateQueries({ queryKey: ["admin-products"] }),
+        ]);
+        navigate({ to: "/admin/products" });
     },
     onError: (err) => setMessage(err instanceof Error ? err.message : "Failed to save."),
   });
@@ -339,7 +340,7 @@ function ProductFormPage() {
           {form.images.length > 0 && (
             <div className="grid grid-cols-3 gap-3 sm:grid-cols-4">
               {form.images.map((img, index) => (
-                <div key={img} className="group relative aspect-[3/4] overflow-hidden bg-muted">
+                <div key={img} className="group relative aspect-[296/443] overflow-hidden bg-muted">
                   <img
                     src={img}
                     alt={`${form.name || "Product"} image ${index + 1}`}
@@ -350,6 +351,15 @@ function ProductFormPage() {
                     <span className="label-mono absolute left-1 top-1 bg-ink px-1.5 py-0.5 text-paper">
                       Cover
                     </span>
+                  )}
+                  {index > 0 && (
+                    <button
+                      type="button"
+                      onClick={() => update("images", [img, ...form.images.filter((image) => image !== img)])}
+                      className="label-mono absolute bottom-1 left-1 bg-paper/95 px-1.5 py-1 text-[8px] text-ink transition-colors hover:bg-accent"
+                    >
+                      Set as cover
+                    </button>
                   )}
                   <button
                     type="button"

@@ -46,9 +46,9 @@
 :root {
   --radius: 0px;
   --ink: oklch(0.145 0 0);
-  --paper: oklch(0.961 0.006 90);
+  --paper: oklch(0.93 0.006 260);
   --muted-ink: oklch(0.52 0.011 85);
-  --line: oklch(0.83 0.012 85);
+  --line: oklch(0.82 0.008 260);
   --accent: oklch(0.652 0.238 33);
 
   --background: var(--paper);
@@ -59,9 +59,9 @@
   --popover-foreground: var(--ink);
   --primary: var(--ink);
   --primary-foreground: var(--paper);
-  --secondary: oklch(0.92 0.008 85);
+  --secondary: oklch(0.89 0.006 260);
   --secondary-foreground: var(--ink);
-  --muted: oklch(0.92 0.008 85);
+  --muted: oklch(0.89 0.006 260);
   --muted-foreground: var(--muted-ink);
   --accent-foreground: var(--ink);
   --destructive: oklch(0.577 0.245 27.325);

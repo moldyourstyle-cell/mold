@@ -8,7 +8,7 @@ export function EditorialLookbook({ content, compact = false }: { content: Lookb
   if (!portrait || !motion || !detail) return null;
 
   return (
-    <section className={compact ? "py-16 sm:py-24" : "py-10 sm:py-20"}>
+    <section className={compact ? "pb-16 pt-0 sm:pb-24" : "py-10 sm:py-20"}>
       <div className="mx-auto max-w-[1500px] px-4 sm:px-6">
         <div className="grid gap-6 border-t border-line pt-5 lg:grid-cols-[1fr_2fr] lg:items-end">
           <div className="label-mono text-muted-ink">{content.eyebrow}</div>

@@ -50,11 +50,23 @@ export type InstagramContent = {
   posts: InstagramPost[];
 };
 
+export type ProductFeature = {
+  text: string;
+  enabled: boolean;
+  lineEnabled: boolean;
+  desktop: { x: number; y: number; tx: number; ty: number };
+  mobile: { x: number; y: number; tx: number; ty: number };
+};
+export type ProductShowcaseContent = { heading: string; image: string; hoverImage: string; imageAlt: string; features: ProductFeature[]; detailVideo: string; detailHeading: string; detailText: string };
+
 export type SiteContent = {
   hero: HeroContent;
   lookbook: LookbookContent;
   instagram: InstagramContent;
+  showcase: ProductShowcaseContent;
 };
+
+const feature = (text: string, x: number, y: number, tx: number, ty: number): ProductFeature => ({ text, enabled: true, lineEnabled: true, desktop: { x, y, tx, ty }, mobile: { x, y, tx, ty } });
 
 export const emptyHeroSlide: HeroSlide = {
   eyebrow: "New slide",
@@ -112,6 +124,11 @@ export function normalizeHero(hero: HeroContent | undefined | null): {
 }
 
 export const defaultSiteContent: SiteContent = {
+  showcase: {
+    heading: "FORM, WITH INTENTION.", image: "/editorial/mold-look-2.jpg", hoverImage: "/editorial/mold-look-1.jpg", imageAlt: "MOLD garment close-up showing considered construction",
+    detailVideo: "", detailHeading: "MADE TO MOVE. BUILT TO LAST.", detailText: "Dense, considered fabric meets a silhouette made for the everyday. Each detail earns its place — from the weight of the cloth to the finish of every seam.",
+    features: [feature("Heavyweight cotton twill", 57, 28, 75, 22), feature("Built-in utility pocket", 61, 48, 78, 48), feature("Reinforced double stitch", 54, 72, 76, 78)],
+  },
   hero: {
     intervalSeconds: 6,
     slides: defaultHeroSlides,
