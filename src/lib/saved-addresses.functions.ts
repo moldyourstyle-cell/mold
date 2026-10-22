@@ -40,7 +40,7 @@ const savedAddressInput = z.object({
 });
 
 export const saveAddress = createServerFn({ method: "POST" })
-  .inputValidator(savedAddressInput)
+  .validator(savedAddressInput)
   .middleware([requireSupabaseAuth])
   .handler(async ({ context, data }) => {
     if (data.isDefault) {
@@ -68,7 +68,7 @@ export const saveAddress = createServerFn({ method: "POST" })
   });
 
 export const deleteSavedAddress = createServerFn({ method: "POST" })
-  .inputValidator((value: unknown) => z.string().uuid().parse(value))
+  .validator((value: unknown) => z.string().uuid().parse(value))
   .middleware([requireSupabaseAuth])
   .handler(async ({ context, data: id }) => {
     const { error } = await context.supabase

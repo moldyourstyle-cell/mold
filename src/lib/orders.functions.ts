@@ -111,7 +111,7 @@ async function getApplicableCoupon(code: string, subtotal: number) {
 }
 
 export const validateCheckoutCoupon = createServerFn({ method: "POST" })
-  .inputValidator(z.object({ code: z.string().trim().min(2).max(40), subtotal: z.number().int().min(0) }))
+  .validator(z.object({ code: z.string().trim().min(2).max(40), subtotal: z.number().int().min(0) }))
   .handler(async ({ data }) => {
     const result = await getApplicableCoupon(data.code, data.subtotal);
     return { code: result.code, discountAmount: result.discountAmount };
@@ -120,7 +120,7 @@ export const validateCheckoutCoupon = createServerFn({ method: "POST" })
 
 /** Public: places a Cash-on-Delivery order. Prices are re-read server-side. */
 export const placeOrder = createServerFn({ method: "POST" })
-  .inputValidator(placeOrderInput)
+  .validator(placeOrderInput)
   .handler(async ({ data }) => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { data: storeSettings } = await supabaseAdmin
@@ -312,7 +312,7 @@ export type TrackedOrder = {
  * checkout. Returns only customer-safe fields (no address or contact data).
  */
 export const trackOrder = createServerFn({ method: "GET" })
-  .inputValidator(
+  .validator(
     (input: unknown) =>
       z
         .object({
@@ -421,7 +421,7 @@ export const listOrders = createServerFn({ method: "GET" })
   });
 
 export const updateOrderStatus = createServerFn({ method: "POST" })
-  .inputValidator(
+  .validator(
     z.object({
       id: z.string().uuid(),
       status: z.enum(["pending", "confirmed", "packed", "shipped", "delivered", "cancelled", "returned"]),
@@ -454,7 +454,7 @@ export const updateOrderStatus = createServerFn({ method: "POST" })
   });
 
 export const deleteOrder = createServerFn({ method: "POST" })
-  .inputValidator((id: string) => z.string().uuid().parse(id))
+  .validator((id: string) => z.string().uuid().parse(id))
   .middleware([requireSupabaseAuth])
   .handler(async ({ context, data: id }) => {
     await requireAdmin(context);

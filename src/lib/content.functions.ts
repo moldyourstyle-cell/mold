@@ -79,7 +79,7 @@ export const getAdminSiteContent = createServerFn({ method: "GET" })
   });
 
 export const updateSiteContent = createServerFn({ method: "POST" })
-  .inputValidator(contentInput)
+  .validator(contentInput)
   .middleware([requireSupabaseAuth])
   .handler(async ({ context, data }) => {
     await requireAdmin(context);

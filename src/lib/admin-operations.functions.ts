@@ -95,7 +95,7 @@ const couponInput = z.object({
 });
 
 export const saveCoupon = createServerFn({ method: "POST" })
-  .inputValidator(couponInput)
+  .validator(couponInput)
   .middleware([requireSupabaseAuth])
   .handler(async ({ context, data }) => {
     await requireAdmin(context);
@@ -119,7 +119,7 @@ export const saveCoupon = createServerFn({ method: "POST" })
   });
 
 export const deleteCoupon = createServerFn({ method: "POST" })
-  .inputValidator((id: string) => z.string().uuid().parse(id))
+  .validator((id: string) => z.string().uuid().parse(id))
   .middleware([requireSupabaseAuth])
   .handler(async ({ context, data: id }) => {
     await requireAdmin(context);
@@ -170,7 +170,7 @@ const settingsInput = z.object({
 });
 
 export const saveStoreSettings = createServerFn({ method: "POST" })
-  .inputValidator(settingsInput)
+  .validator(settingsInput)
   .middleware([requireSupabaseAuth])
   .handler(async ({ context, data }) => {
     await requireAdmin(context);

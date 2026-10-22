@@ -95,7 +95,7 @@ export const listAdminProducts = createServerFn({ method: "GET" })
   });
 
 export const getAdminProduct = createServerFn({ method: "GET" })
-  .inputValidator((id: string) => z.string().uuid().parse(id))
+  .validator((id: string) => z.string().uuid().parse(id))
   .middleware([requireSupabaseAuth])
   .handler(async ({ context, data: id }) => {
     await requireAdmin(context);
@@ -105,7 +105,7 @@ export const getAdminProduct = createServerFn({ method: "GET" })
   });
 
 export const createProduct = createServerFn({ method: "POST" })
-  .inputValidator(productInput)
+  .validator(productInput)
   .middleware([requireSupabaseAuth])
   .handler(async ({ context, data }) => {
     await requireAdmin(context);
@@ -139,7 +139,7 @@ export const createProduct = createServerFn({ method: "POST" })
   });
 
 export const updateProduct = createServerFn({ method: "POST" })
-  .inputValidator(
+  .validator(
     z.object({
       id: z.string().uuid(),
       values: productInput,
@@ -180,7 +180,7 @@ export const updateProduct = createServerFn({ method: "POST" })
   });
 
 export const deleteProduct = createServerFn({ method: "POST" })
-  .inputValidator((id: string) => z.string().uuid().parse(id))
+  .validator((id: string) => z.string().uuid().parse(id))
   .middleware([requireSupabaseAuth])
   .handler(async ({ context, data: id }) => {
     await requireAdmin(context);

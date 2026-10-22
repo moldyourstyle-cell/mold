@@ -33,7 +33,7 @@ const reserveInput = z.object({
 
 /** Public: holds the selected quantities for a short window while the shopper checks out. */
 export const reserveStock = createServerFn({ method: "POST" })
-  .inputValidator(reserveInput)
+  .validator(reserveInput)
   .handler(async ({ data }) => {
     const expiresAt = (await rpc("reserve_stock", {
       _token: data.token,
@@ -49,7 +49,7 @@ export const reserveStock = createServerFn({ method: "POST" })
 
 /** Public: gives the held stock back to everyone else. */
 export const releaseStock = createServerFn({ method: "POST" })
-  .inputValidator((token: unknown) => z.string().uuid().parse(token))
+  .validator((token: unknown) => z.string().uuid().parse(token))
   .handler(async ({ data: token }) => {
     await rpc("release_reservation", { _token: token });
     return { ok: true };
