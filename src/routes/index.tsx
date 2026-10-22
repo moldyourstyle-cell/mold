@@ -59,12 +59,12 @@ function Home() {
           <p className="text-sm text-ink">
             Your sign-in link expired before sign-in finished. Start again to get a fresh link.
           </p>
-          <Link
-            to="/auth"
+          <a
+            href="https://mold-gold.vercel.app/auth"
             className="shrink-0 bg-ink px-5 py-3 text-[10px] font-semibold uppercase tracking-[0.14em] text-paper transition-opacity hover:opacity-80"
           >
             Try signing in again
-          </Link>
+          </a>
         </div>
       )}
       <HeroCarousel content={hero} />
