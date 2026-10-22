@@ -157,18 +157,23 @@ function Shell() {
   const products = useCatalog();
 
   useEffect(() => {
+    const callbackUrl = new URL(window.location.href);
     const isOAuthCallback =
-      window.location.pathname === "/" && window.location.hash.includes("access_token=");
+      callbackUrl.hash.includes("access_token=") || callbackUrl.searchParams.has("code");
     let callbackHandled = false;
 
     const finishOAuthCallback = (session: { user: unknown } | null) => {
       if (!isOAuthCallback || !session || callbackHandled) return;
       callbackHandled = true;
-      // Remove the bearer tokens from the address bar after Supabase has read them.
+      const cleanUrl = new URL(window.location.href);
+      cleanUrl.hash = "";
+      for (const parameter of ["code", "state", "error", "error_code", "error_description"]) {
+        cleanUrl.searchParams.delete(parameter);
+      }
       window.history.replaceState(
         window.history.state,
         "",
-        `${window.location.pathname}${window.location.search}`,
+        `${cleanUrl.pathname}${cleanUrl.search}`,
       );
       void router.navigate({ to: "/account" });
     };

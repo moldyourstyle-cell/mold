@@ -4,6 +4,8 @@ import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 
+const GOOGLE_AUTH_REDIRECT_URL = "https://mold-gold.vercel.app/auth";
+
 export const Route = createFileRoute("/auth")({
   head: () => ({
     meta: [
@@ -142,7 +144,7 @@ function AuthPage() {
     setGoogleLoading(true);
     const { error } = await supabase.auth.signInWithOAuth({
       provider: "google",
-      options: { redirectTo: `${window.location.origin}/account` },
+      options: { redirectTo: GOOGLE_AUTH_REDIRECT_URL },
     });
     if (error) {
       setGoogleLoading(false);
