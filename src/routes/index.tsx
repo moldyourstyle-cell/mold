@@ -10,6 +10,7 @@ import { EditorialLookbook } from "@/components/EditorialLookbook";
 import { InstagramFeed } from "@/components/InstagramFeed";
 import { HeroCarousel } from "@/components/HeroCarousel";
 import { ProductDetailEditorial } from "@/components/ProductDetailEditorial";
+import { useEffect, useState } from "react";
 
 export const Route = createFileRoute("/")({
   loader: ({ context }) => context.queryClient.ensureQueryData(siteContentQuery),
@@ -38,6 +39,13 @@ export const Route = createFileRoute("/")({
 function Home() {
   const products = useCatalog();
   const { hero, lookbook, instagram, showcase } = useSiteContent();
+  const [oauthError, setOauthError] = useState(false);
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.has("error") || params.has("error_code")) setOauthError(true);
+  }, []);
+
   const latest = [...products]
     .sort((a, b) => Number(!!b.isNew) - Number(!!a.isNew) || b.createdAt.localeCompare(a.createdAt))
     .slice(0, 4);
@@ -46,6 +54,19 @@ function Home() {
 
   return (
     <>
+      {oauthError && (
+        <div role="alert" className="mx-auto flex max-w-[1500px] flex-col items-start gap-3 border-b border-line bg-paper px-4 py-5 sm:flex-row sm:items-center sm:justify-between sm:px-6">
+          <p className="text-sm text-ink">
+            Your sign-in link expired before sign-in finished. Start again to get a fresh link.
+          </p>
+          <Link
+            to="/auth"
+            className="shrink-0 bg-ink px-5 py-3 text-[10px] font-semibold uppercase tracking-[0.14em] text-paper transition-opacity hover:opacity-80"
+          >
+            Try signing in again
+          </Link>
+        </div>
+      )}
       <HeroCarousel content={hero} />
 
 

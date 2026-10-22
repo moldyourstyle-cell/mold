@@ -157,11 +157,38 @@ function Shell() {
   const products = useCatalog();
 
   useEffect(() => {
-    const { data } = supabase.auth.onAuthStateChange((event) => {
+    const isOAuthCallback =
+      window.location.pathname === "/" && window.location.hash.includes("access_token=");
+    let callbackHandled = false;
+
+    const finishOAuthCallback = (session: { user: unknown } | null) => {
+      if (!isOAuthCallback || !session || callbackHandled) return;
+      callbackHandled = true;
+      // Remove the bearer tokens from the address bar after Supabase has read them.
+      window.history.replaceState(
+        window.history.state,
+        "",
+        `${window.location.pathname}${window.location.search}`,
+      );
+      void router.navigate({ to: "/account" });
+    };
+
+    const { data } = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === "SIGNED_IN" || event === "INITIAL_SESSION") {
+        finishOAuthCallback(session);
+      }
       if (event !== "SIGNED_IN" && event !== "SIGNED_OUT" && event !== "USER_UPDATED") return;
       router.invalidate();
       if (event !== "SIGNED_OUT") queryClient.invalidateQueries();
     });
+
+    // Cover callbacks where Supabase completed URL detection before this listener mounted.
+    if (isOAuthCallback) {
+      void supabase.auth.getSession().then(({ data: sessionData }) => {
+        finishOAuthCallback(sessionData.session);
+      });
+    }
+
     return () => data.subscription.unsubscribe();
   }, [router, queryClient]);
 
