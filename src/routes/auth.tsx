@@ -144,7 +144,10 @@ function AuthPage() {
     setGoogleLoading(true);
     const { error } = await supabase.auth.signInWithOAuth({
       provider: "google",
-      options: { redirectTo: GOOGLE_AUTH_REDIRECT_URL },
+      options: {
+        redirectTo: GOOGLE_AUTH_REDIRECT_URL,
+        queryParams: { prompt: "select_account" },
+      },
     });
     if (error) {
       setGoogleLoading(false);
