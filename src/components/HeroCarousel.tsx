@@ -22,6 +22,8 @@ export function HeroCarousel({ content }: { content: HeroContent }) {
 
   const slide = slides[Math.min(index, slides.length - 1)]!;
 
+  if (slides.length === 0) return null;
+
   return (
     <section className="relative aspect-[2/1] w-full overflow-hidden bg-ink text-paper sm:aspect-[966/362]">
       {slides.map((item, i) => (
@@ -32,14 +34,16 @@ export function HeroCarousel({ content }: { content: HeroContent }) {
             i === index ? "opacity-100" : "opacity-0"
           }`}
         >
-          <SiteMedia
-            src={item.image}
-            alt={i === index ? item.imageAlt : ""}
-            eager={i === 0}
-            width={1920}
-            height={1080}
-            className="h-full w-full object-cover object-center"
-          />
+          {i === index && (
+            <SiteMedia
+              src={item.image}
+              alt={item.imageAlt}
+              eager
+              width={1920}
+              height={1080}
+              className="h-full w-full object-cover object-center"
+            />
+          )}
         </div>
       ))}
 

@@ -24,6 +24,7 @@ export const Route = createFileRoute("/auth")({
 function AuthPage() {
   const navigate = useNavigate();
   const [mode, setMode] = useState<"signin" | "signup">("signin");
+  const [passwordRecovery, setPasswordRecovery] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -41,13 +42,19 @@ function AuthPage() {
       if (event === "SIGNED_IN") {
         setStatus("Email confirmed — you're signed in.");
       }
+      if (event === "PASSWORD_RECOVERY") {
+        setPasswordRecovery(true);
+        setMode("signin");
+        setPassword("");
+        setStatus("Choose a password for your account.");
+      }
     });
     return () => data.subscription.unsubscribe();
   }, []);
 
   function validate() {
     const next: { email?: string; password?: string } = {};
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) next.email = "Enter a valid email address.";
+    if (!passwordRecovery && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) next.email = "Enter a valid email address.";
     if (password.length < 6) next.password = "Minimum 6 characters.";
     setErrors(next);
     return Object.keys(next).length === 0;
@@ -58,6 +65,20 @@ function AuthPage() {
     setStatus("");
     if (!validate()) return;
     setLoading(true);
+
+    if (passwordRecovery) {
+      const { error } = await supabase.auth.updateUser({ password });
+      setLoading(false);
+      if (error) {
+        setStatus(error.message);
+        return;
+      }
+      setPasswordRecovery(false);
+      setPassword("");
+      setStatus("Password set. You're signed in.");
+      navigate({ to: "/account" });
+      return;
+    }
 
     if (mode === "signup") {
       const normalizedEmail = email.trim().toLowerCase();
@@ -76,18 +97,19 @@ function AuthPage() {
       setStatus(
         data.session
           ? "Your account is ready — you're signed in."
-          : "Check your email to confirm your account. If it doesn't arrive, use Resend confirmation below.",
+          : "Signup received. If email confirmation is enabled, a link should arrive shortly. Check spam or promotions; if it doesn't arrive, request another link below. Existing accounts can log in or reset their password.",
       );
       return;
     }
 
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
+    const normalizedEmail = email.trim().toLowerCase();
+    const { error } = await supabase.auth.signInWithPassword({ email: normalizedEmail, password });
     setLoading(false);
     if (error) {
       if (error.message.toLowerCase().includes("email not confirmed")) {
         const { error: resendError } = await supabase.auth.resend({
           type: "signup",
-          email,
+          email: normalizedEmail,
           options: { emailRedirectTo: `${window.location.origin}/auth` },
         });
         setStatus(
@@ -96,7 +118,9 @@ function AuthPage() {
             : "Your email isn't confirmed yet — we've sent you a new confirmation link. Check your inbox and spam folder.",
         );
       } else {
-        setStatus(error.message);
+        setStatus(error.message.toLowerCase().includes("invalid login credentials")
+          ? "Invalid email or password. If you created this account with Google, use “Forgot password?” to set an email password first."
+          : error.message);
       }
       return;
     }
@@ -121,7 +145,7 @@ function AuthPage() {
     setStatus(
       error
         ? error.message
-        : "A new confirmation link has been sent. Check your inbox and spam folder.",
+        : "Confirmation link requested. Check your inbox, spam, and promotions folders. If nothing arrives, your email provider may not be configured to deliver confirmation mail.",
     );
   }
 
@@ -132,7 +156,7 @@ function AuthPage() {
       return;
     }
     setLoading(true);
-    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+    const { error } = await supabase.auth.resetPasswordForEmail(email.trim().toLowerCase(), {
       redirectTo: `${window.location.origin}/auth`,
     });
     setLoading(false);
@@ -167,16 +191,16 @@ function AuthPage() {
 
         <div className="text-center">
           <h1 className="font-[var(--font-body)] text-2xl font-semibold tracking-tight text-ink">
-            {mode === "signin" ? "Welcome back" : "Create your account"}
+            {passwordRecovery ? "Set your password" : mode === "signin" ? "Welcome back" : "Create your account"}
           </h1>
           <p className="mt-2 text-sm text-muted-ink">
-            {mode === "signin" ? "Log in to continue to MOLD." : "Join MOLD to track orders and check out faster."}
+            {passwordRecovery ? "Choose a password to sign in with email next time." : mode === "signin" ? "Log in to continue to MOLD." : "Join MOLD to track orders and check out faster."}
           </p>
         </div>
 
         <form onSubmit={submit} className="mt-10 space-y-5" noValidate>
           {/* Email */}
-          <div>
+          {!passwordRecovery && <div>
             <label htmlFor="email" className="label-mono block text-muted-ink">
               Email
             </label>
@@ -194,7 +218,7 @@ function AuthPage() {
               className="mt-2 w-full border-b border-line bg-transparent px-0 py-3 text-sm text-ink outline-none transition-colors placeholder:text-muted-ink/60 focus:border-ink"
             />
             {errors.email && <p className="mt-1.5 text-xs text-destructive">{errors.email}</p>}
-          </div>
+          </div>}
 
           {/* Password */}
           <div>
@@ -202,7 +226,7 @@ function AuthPage() {
               <label htmlFor="password" className="label-mono text-muted-ink">
                 Password
               </label>
-              {mode === "signin" && (
+              {mode === "signin" && !passwordRecovery && (
                 <button
                   type="button"
                   onClick={resetPassword}
@@ -216,7 +240,7 @@ function AuthPage() {
               <input
                 id="password"
                 required
-                autoComplete={mode === "signin" ? "current-password" : "new-password"}
+                autoComplete={mode === "signin" && !passwordRecovery ? "current-password" : "new-password"}
                 type={showPassword ? "text" : "password"}
                 minLength={6}
                 value={password}
@@ -250,7 +274,7 @@ function AuthPage() {
                   onClick={resendConfirmation}
                   className="h-auto p-0 text-xs font-medium text-ink underline underline-offset-4 disabled:opacity-60"
                 >
-                  {resending ? "Sending…" : "Resend confirmation"}
+                  {resending ? "Requesting…" : "Request another confirmation link"}
                 </Button>
               )}
             </div>
@@ -267,7 +291,7 @@ function AuthPage() {
                 <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-paper [animation-delay:150ms]" />
                 <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-paper [animation-delay:300ms]" />
               </span>
-            ) : mode === "signin" ? "Log In" : "Create account"}
+            ) : passwordRecovery ? "Set password" : mode === "signin" ? "Log In" : "Create account"}
           </Button>
         </form>
 

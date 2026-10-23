@@ -73,40 +73,13 @@ export const emptyHeroSlide: HeroSlide = {
   title: "HEADLINE",
   accent: "ACCENT LINE",
   description: "Add a short supporting line for this slide.",
-  image: "/editorial/mold-hero.jpg",
+  image: "",
   imageAlt: "MOLD campaign image",
   primaryLabel: "Shop now",
   primaryHref: "/shop",
   secondaryLabel: "View editorial",
   secondaryHref: "/lookbook",
 };
-
-export const defaultHeroSlides: HeroSlide[] = [
-  {
-    eyebrow: "Campaign 01 / Chennai",
-    title: "BUILT FOR THE STREETS.",
-    accent: "NOT THE CROWD.",
-    description: "Heavy silhouettes, stripped back and released in limited numbers.",
-    image: "/editorial/mold-hero.jpg",
-    imageAlt: "MOLD model wearing a black oversized jacket against raw concrete",
-    primaryLabel: "Shop Drop 07",
-    primaryHref: "/shop?sort=newest",
-    secondaryLabel: "View editorial",
-    secondaryHref: "/lookbook",
-  },
-  {
-    eyebrow: "Editorial 001 / Drop 07",
-    title: "CONCRETE. HEAT.",
-    accent: "MOTION.",
-    description: "Photographed where dense fabric meets dense streets.",
-    image: "/editorial/mold-look-3.jpg",
-    imageAlt: "MOLD olive utility set in motion on a wet street",
-    primaryLabel: "Shop the drop",
-    primaryHref: "/shop",
-    secondaryLabel: "See the lookbook",
-    secondaryHref: "/lookbook",
-  },
-];
 
 /** Normalises legacy single-slide hero content into a slide list. */
 export function normalizeHero(hero: HeroContent | undefined | null): {
@@ -115,23 +88,31 @@ export function normalizeHero(hero: HeroContent | undefined | null): {
 } {
   const rawInterval = Number(hero?.intervalSeconds);
   const intervalSeconds = Number.isFinite(rawInterval) && rawInterval >= 1 ? rawInterval : 6;
-  const slides = hero?.slides?.length
+  const candidates = hero?.slides?.length
     ? hero.slides
     : hero?.image || hero?.title
       ? [{ ...emptyHeroSlide, ...hero } as HeroSlide]
-      : defaultHeroSlides;
+      : [];
+  const slides = candidates.filter((slide) => isUploadedMedia(slide.image));
   return { intervalSeconds, slides };
+}
+
+/** Exclude shipped demo assets even when older CMS rows still reference them. */
+export function isUploadedMedia(url: string | undefined | null): boolean {
+  const value = url?.trim();
+  if (!value) return false;
+  return !/^\/?(?:editorial\/)?mold-(?:hero|look-[123])\.jpg(?:[?#].*)?$/i.test(value);
 }
 
 export const defaultSiteContent: SiteContent = {
   showcase: {
-    heading: "FORM, WITH INTENTION.", image: "/editorial/mold-look-2.jpg", hoverImage: "/editorial/mold-look-1.jpg", imageAlt: "MOLD garment close-up showing considered construction",
+    heading: "FORM, WITH INTENTION.", image: "", hoverImage: "", imageAlt: "",
     detailVideo: "", detailHeading: "MADE TO MOVE. BUILT TO LAST.", detailText: "Dense, considered fabric meets a silhouette made for the everyday. Each detail earns its place — from the weight of the cloth to the finish of every seam.",
     features: [feature("Heavyweight cotton twill", 57, 28, 75, 22), feature("Built-in utility pocket", 61, 48, 78, 48), feature("Reinforced double stitch", 54, 72, 76, 78)],
   },
   hero: {
     intervalSeconds: 6,
-    slides: defaultHeroSlides,
+    slides: [],
   },
   lookbook: {
     eyebrow: "Editorial 001",
@@ -143,38 +124,14 @@ export const defaultSiteContent: SiteContent = {
     storyBody:
       "Built in Chennai and cut to move through it. Each look balances hard structure with room to breathe — oversized layers, grounded proportions and details made to wear in, not out.",
     ctaLabel: "Explore the full story",
-    images: [
-      {
-        url: "/editorial/mold-look-1.jpg",
-        alt: "MOLD model in a dark hoodie on a Chennai street",
-        caption: "Look 01 — Heavy form",
-        orientation: "portrait",
-      },
-      {
-        url: "/editorial/mold-look-3.jpg",
-        alt: "MOLD olive utility set in motion on a wet street",
-        caption: "Look 02 — Utility in motion",
-        orientation: "landscape",
-      },
-      {
-        url: "/editorial/mold-look-2.jpg",
-        alt: "Close detail of washed fabric and metal hardware",
-        caption: "Detail 01 — Built to age",
-        orientation: "landscape",
-      },
-    ],
+    images: [],
   },
   instagram: {
     eyebrow: "Live archive",
     title: "WORN OUTSIDE",
     handle: "@_mold._",
     profileUrl: "https://www.instagram.com/_mold._",
-    posts: [
-      { image: "/editorial/mold-look-1.jpg", alt: "MOLD dark hoodie street portrait", caption: "Heavy form / Chennai", url: "https://www.instagram.com/_mold._" },
-      { image: "/editorial/mold-look-2.jpg", alt: "MOLD garment hardware detail", caption: "Details that wear in", url: "https://www.instagram.com/_mold._" },
-      { image: "/editorial/mold-look-3.jpg", alt: "MOLD utility set walking through the city", caption: "Utility in motion", url: "https://www.instagram.com/_mold._" },
-      { image: "/editorial/mold-hero.jpg", alt: "MOLD black outerwear against concrete", caption: "Drop 07 / Built heavy", url: "https://www.instagram.com/_mold._" },
-    ],
+    posts: [],
   },
 };
 
