@@ -95,7 +95,7 @@ export function ProductCard({ product, priority }: { product: Product; priority?
         {!soldOut && (
           <button
             onClick={() => addToCart(product.id, product.sizes[Math.min(1, product.sizes.length - 1)] ?? "M")}
-            className="absolute bottom-2 left-2 right-12 hidden translate-y-full rounded-md bg-ink/50 py-2.5 text-[10px] font-semibold uppercase tracking-[0.12em] text-paper shadow-sm backdrop-blur-sm transition-transform duration-300 group-hover:translate-y-0 sm:block"
+            className="absolute bottom-2 left-2 right-12 hidden translate-y-[calc(100%+1rem)] rounded-md bg-ink/50 py-2.5 text-[10px] font-semibold uppercase tracking-[0.12em] text-paper shadow-sm backdrop-blur-sm transition-transform duration-300 group-hover:translate-y-0 sm:block"
           >
             Quick add +
           </button>
