@@ -132,7 +132,7 @@ function ProductPage() {
           <h1 className="display mt-2 text-[clamp(2rem,5vw,3.5rem)]">{product.name}</h1>
 
           <div className="mt-4 flex flex-wrap items-baseline gap-3">
-            <span className="text-xl font-semibold">{formatINR(product.price)}</span>
+            <span className="text-xl font-semibold text-blue-600">{formatINR(product.price)}</span>
             {product.compareAtPrice && (
               <>
                 <span className="text-sm text-muted-ink line-through">
@@ -194,7 +194,7 @@ function ProductPage() {
             <button
               disabled={soldOut}
               onClick={handleAdd}
-              className="flex-1 bg-ink py-4 text-[11px] font-semibold uppercase tracking-[0.14em] text-paper transition-colors hover:bg-accent hover:text-ink disabled:opacity-40"
+              className="w-3/4 max-w-full flex-[0_1_70%] bg-ink py-4 text-[11px] font-semibold uppercase tracking-[0.14em] text-paper transition-colors hover:bg-accent hover:text-ink disabled:opacity-40"
             >
               {soldOut ? "Out of stock" : "Add to cart"}
             </button>
@@ -213,7 +213,7 @@ function ProductPage() {
             type="button"
             disabled={soldOut || reserving}
             onClick={handleBuyNow}
-            className="mt-3 block w-full border border-ink py-4 text-center text-[11px] font-semibold uppercase tracking-[0.14em] transition-colors hover:bg-accent hover:border-accent disabled:opacity-40 disabled:hover:bg-transparent"
+            className="mt-3 block w-3/4 max-w-full border border-ink py-4 text-center text-[11px] font-semibold uppercase tracking-[0.14em] transition-colors hover:bg-accent hover:border-accent disabled:opacity-40 disabled:hover:bg-transparent"
           >
             {soldOut ? "Out of stock" : reserving ? "Reserving…" : "Buy now"}
           </button>
@@ -235,7 +235,12 @@ function ProductPage() {
 
       <section className="mt-20">
         <h2 className="display mb-8 border-b border-line pb-5 text-3xl">You may also like</h2>
-        <ProductGrid products={relatedProducts(products, product)} />
+        <ProductGrid
+          products={relatedProducts(products, product)}
+          boxClassName="w-[250px] max-w-full"
+          imageClassName="h-[310px] w-full"
+          gridClassName="grid-cols-[repeat(auto-fill,250px)] gap-x-2 sm:gap-x-3 lg:gap-x-2"
+        />
       </section>
     </div>
   );

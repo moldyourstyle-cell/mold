@@ -5,7 +5,7 @@ import { discountPercent, type Product } from "@/data/products";
 import { formatINR } from "@/lib/format";
 import { useStore } from "@/lib/store";
 
-export function ProductCard({ product, priority }: { product: Product; priority?: boolean }) {
+export function ProductCard({ product, priority, boxClassName, imageClassName }: { product: Product; priority?: boolean; boxClassName?: string; imageClassName?: string }) {
   const cardRef = useRef<HTMLElement>(null);
   const [visible, setVisible] = useState(false);
   const { addToCart, toggleWishlist, wishlist } = useStore();
@@ -36,11 +36,11 @@ export function ProductCard({ product, priority }: { product: Product; priority?
   return (
     <article
       ref={cardRef}
-      className={`group transition-[opacity,transform] duration-700 ease-out motion-reduce:translate-y-0 motion-reduce:opacity-100 motion-reduce:transition-none ${
+      className={`group transition-[opacity,transform] duration-700 ease-out motion-reduce:translate-y-0 motion-reduce:opacity-100 motion-reduce:transition-none ${boxClassName ?? ""} ${
         visible ? "translate-y-0 opacity-100" : "translate-y-5 opacity-0"
       }`}
     >
-      <div className="relative aspect-[295/443] overflow-hidden bg-secondary">
+      <div className={`relative overflow-hidden bg-secondary ${imageClassName ?? "aspect-[295/443]"}`}>
         <Link
           to="/product/$slug"
           params={{ slug: product.slug }}
@@ -112,7 +112,7 @@ export function ProductCard({ product, priority }: { product: Product; priority?
           </h3>
         </div>
         <div className="shrink-0 text-right">
-          <div className="text-sm font-semibold">{formatINR(product.price)}</div>
+          <div className="text-sm font-semibold text-blue-600">{formatINR(product.price)}</div>
           {product.compareAtPrice && (
             <div className="label-mono text-muted-ink line-through">
               {formatINR(product.compareAtPrice)}

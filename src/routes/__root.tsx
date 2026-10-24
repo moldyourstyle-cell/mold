@@ -157,6 +157,28 @@ function Shell() {
   const products = useCatalog();
 
   useEffect(() => {
+    const handleBackspace = (event: KeyboardEvent) => {
+      if (event.key !== "Backspace" || event.altKey || event.ctrlKey || event.metaKey) return;
+
+      const target = event.target;
+      if (
+        target instanceof HTMLElement &&
+        (target.isContentEditable ||
+          target.closest("input, textarea, select, [contenteditable='true']"))
+      ) {
+        return;
+      }
+
+      event.preventDefault();
+      if (window.history.length > 1) window.history.back();
+      else router.navigate({ to: "/shop" });
+    };
+
+    window.addEventListener("keydown", handleBackspace);
+    return () => window.removeEventListener("keydown", handleBackspace);
+  }, [router]);
+
+  useEffect(() => {
     const callbackUrl = new URL(window.location.href);
     const isOAuthCallback =
       callbackUrl.hash.includes("access_token=") || callbackUrl.searchParams.has("code");
@@ -216,7 +238,7 @@ function Shell() {
                   router.navigate({ to: "/" });
                 }
               }}
-              className="relative top-3 z-10 flex h-10 items-center gap-2 border border-line bg-paper px-3 text-[10px] font-semibold uppercase tracking-[0.14em] transition-colors hover:bg-ink hover:text-paper"
+              className="relative top-3 z-10 flex h-10 items-center gap-2 bg-paper px-3 text-[10px] font-semibold uppercase tracking-[0.14em] transition-colors hover:bg-ink hover:text-paper"
             >
               <ArrowLeft className="h-4 w-4" />
               <span>Back</span>

@@ -11,6 +11,7 @@ type ShopSearch = {
   q?: string | undefined;
   sale?: boolean | undefined;
   inStock?: boolean | undefined;
+  minPrice?: number | undefined;
   maxPrice?: number | undefined;
 };
 
@@ -22,7 +23,14 @@ export const Route = createFileRoute("/shop")({
     q: (search["q"] as string) || undefined,
     sale: search["sale"] ? true : undefined,
     inStock: search["inStock"] ? true : undefined,
-    maxPrice: search["maxPrice"] ? Number(search["maxPrice"]) : undefined,
+    minPrice:
+      search["minPrice"] !== undefined && search["minPrice"] !== null
+        ? Number(search["minPrice"])
+        : undefined,
+    maxPrice:
+      search["maxPrice"] !== undefined && search["maxPrice"] !== null
+        ? Number(search["maxPrice"])
+        : undefined,
   }),
 
   head: () => ({
@@ -60,7 +68,8 @@ function Shop() {
     if (search.size && !p.sizes.some((size) => size.toUpperCase() === search.size)) return false;
     if (search.sale && !p.isClearanceSale) return false;
     if (search.inStock && p.stock === 0) return false;
-    if (search.maxPrice && p.price > search.maxPrice) return false;
+    if (p.price < (search.minPrice ?? 0)) return false;
+    if (p.price > (search.maxPrice ?? 500)) return false;
     if (search.q) {
       const q = search.q.toLowerCase();
       const hay = `${p.name} ${p.category} ${p.tags.join(" ")}`.toLowerCase();
@@ -72,7 +81,7 @@ function Shop() {
   list = [...list].sort((a, b) => {
     if (search.sort === "price-asc") return a.price - b.price;
     if (search.sort === "price-desc") return b.price - a.price;
-    if (search.sort === "newest") return b.createdAt.localeCompare(a.createdAt);
+    if (search.sort === "newest" || !search.sort) return b.createdAt.localeCompare(a.createdAt);
     return 0;
   });
 
@@ -107,21 +116,28 @@ function Shop() {
         </div>
 
         <div className="flex flex-wrap items-center gap-3">
-          <span className="label-mono mr-1 text-muted-ink">Price up to</span>
-          <input
-            type="range"
-            min={1000}
-            max={6000}
-            step={500}
-            value={search.maxPrice ?? 6000}
-            onChange={(e) =>
-              setSearch({
-                maxPrice: Number(e.target.value) === 6000 ? undefined : Number(e.target.value),
-              })
-            }
-            className="w-40 accent-[oklch(0.652_0.238_33)]"
-          />
-          <span className="label-mono">₹{(search.maxPrice ?? 6000).toLocaleString("en-IN")}</span>
+          <label className="flex items-center gap-2">
+            <span className="label-mono text-muted-ink">Price range</span>
+            <select
+              value={`${search.minPrice ?? 0}-${search.maxPrice ?? 500}`}
+              onChange={(e) => {
+                const [min, max] = e.target.value.split("-").map(Number);
+                setSearch({
+                  minPrice: min === 0 ? undefined : min,
+                  maxPrice: max === 6000 ? undefined : max,
+                });
+              }}
+              className="label-mono border border-line bg-paper px-2 py-1.5 text-ink"
+            >
+              <option value="0-500">₹0–₹500</option>
+              <option value="500-1000">₹500–₹1,000</option>
+              <option value="1000-2000">₹1,000–₹2,000</option>
+              <option value="2000-3000">₹2,000–₹3,000</option>
+              <option value="3000-4000">₹3,000–₹4,000</option>
+              <option value="4000-5000">₹4,000–₹5,000</option>
+              <option value="5000-6000">₹5,000–₹6,000</option>
+            </select>
+          </label>
 
           <FilterChip active={!!search.sale} onClick={() => setSearch({ sale: search.sale ? undefined : true })}>
             On sale
@@ -136,13 +152,13 @@ function Shop() {
           <label className="label-mono ml-auto flex items-center gap-2 text-muted-ink">
             Sort
             <select
-              value={search.sort ?? ""}
+              value={search.sort ?? "newest"}
               onChange={(e) =>
                 setSearch({ sort: (e.target.value || undefined) as ShopSearch["sort"] })
               }
               className="label-mono border border-line bg-paper px-2 py-1.5 text-ink"
             >
-              <option value="">Featured</option>
+              <option value="">Sort by</option>
               <option value="newest">Newest</option>
               <option value="price-asc">Price: low to high</option>
               <option value="price-desc">Price: high to low</option>

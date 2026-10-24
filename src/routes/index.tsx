@@ -94,7 +94,7 @@ function Home() {
             View all <span className="text-accent">→</span>
           </Link>
         </div>
-        <ProductGrid products={latest} />
+        <ProductGrid products={latest} gridClassName="[&_h3]:font-medium" />
       </section>
 
       <ProductDetailEditorial content={showcase} />

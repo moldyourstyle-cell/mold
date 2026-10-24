@@ -9,9 +9,9 @@ export function EditorialLookbook({ content, compact = false }: { content: Lookb
   const [portrait, motion, detail] = images;
 
   return (
-    <section className={compact ? "pb-16 pt-0 sm:pb-24" : "py-10 sm:py-20"}>
+    <section className={compact ? "pb-16 pt-8 sm:pb-24 sm:pt-10" : "py-10 sm:py-20"}>
       <div className="mx-auto max-w-[1500px] px-4 sm:px-6">
-        <div className="border-t border-line pt-0">
+        <div className="pt-4 sm:pt-5">
           <div className="flex flex-col gap-3 lg:flex-row lg:items-end lg:justify-between">
             <h2 className="display section-heading">{content.title}</h2>
             <span className="label-mono shrink-0 text-muted-ink">{content.season}</span>
@@ -20,7 +20,7 @@ export function EditorialLookbook({ content, compact = false }: { content: Lookb
 
         <div className="mt-10 grid grid-cols-12 gap-3 sm:gap-5">
           {portrait && <figure className="col-span-10 md:col-span-6 md:col-start-1">
-            <SiteMedia src={portrait.url} alt={portrait.alt} className="aspect-[4/5] w-full object-cover" />
+            <SiteMedia src={portrait.url} alt={portrait.alt} className="aspect-[9/11] w-[900px] max-w-full object-cover" />
             <figcaption className="label-mono mt-3 text-muted-ink">{portrait.caption}</figcaption>
           </figure>}
           {motion && <div className="col-span-12 mt-8 md:col-span-5 md:col-start-8 md:mt-24">

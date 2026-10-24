@@ -1,11 +1,10 @@
 import { Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { Heart, Menu, Search, User, X } from "lucide-react";
+import { Heart, Menu, Search, ShoppingBag, User, X } from "lucide-react";
 import { categories } from "@/data/products";
 import { useStore } from "@/lib/store";
 
 const navLinks = [
-  { label: "Shop", to: "/shop" as const, search: {} },
   { label: "New Drop", to: "/shop" as const, search: { sort: "newest" as const } },
   ...categories.map((c) => ({
     label: c.name,
@@ -76,13 +75,32 @@ export function Header({ transparentOnHome = false }: { transparentOnHome?: bool
         </nav>
 
         <div className="flex items-center justify-end gap-3 sm:gap-4">
-          <button
-            aria-label="Search"
-            onClick={() => setSearchOpen((v) => !v)}
-            className="p-2 transition-colors hover:text-accent"
-          >
-            <Search className="h-[18px] w-[18px]" />
-          </button>
+          {searchOpen ? (
+            <form onSubmit={submitSearch} className="flex w-36 items-center border-b border-current sm:w-48">
+              <input
+                autoFocus
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                placeholder="Search products"
+                aria-label="Search products"
+                className="label-mono min-w-0 flex-1 bg-transparent py-2 text-[10px] outline-none placeholder:text-muted-ink"
+              />
+              <button type="submit" aria-label="Submit search" className="p-2 hover:text-accent">
+                <Search className="h-[18px] w-[18px]" />
+              </button>
+              <button type="button" aria-label="Close search" onClick={() => setSearchOpen(false)} className="p-1 hover:text-accent">
+                <X className="h-4 w-4" />
+              </button>
+            </form>
+          ) : (
+            <button
+              aria-label="Search"
+              onClick={() => setSearchOpen(true)}
+              className="p-2 transition-colors hover:text-accent"
+            >
+              <Search className="h-[18px] w-[18px]" />
+            </button>
+          )}
           <Link
             to="/account"
             aria-label="Account"
@@ -102,33 +120,17 @@ export function Header({ transparentOnHome = false }: { transparentOnHome?: bool
           </Link>
           <button
             onClick={() => setCartOpen(true)}
-            className="label-mono border border-current px-3 py-1.5 transition-colors hover:bg-ink hover:text-paper"
+            aria-label={`Cart, ${count} items`}
+            className="relative p-2 transition-colors hover:text-accent"
           >
-            Cart · {count}
+            <ShoppingBag className="h-[18px] w-[18px]" aria-hidden="true" />
+            <span className="label-mono absolute -right-2 -top-2 min-w-4 bg-accent px-1 text-center text-[10px] leading-4 text-ink">
+              {count}
+            </span>
           </button>
         </div>
       </div>
 
-      {searchOpen && (
-        <div className="border-t border-line bg-paper">
-          <form
-            onSubmit={submitSearch}
-            className="mx-auto flex max-w-[1500px] items-center gap-3 px-4 py-3 sm:px-6"
-          >
-            <Search className="h-4 w-4 shrink-0 text-muted-ink" />
-            <input
-              autoFocus
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              placeholder="SEARCH PRODUCTS"
-              className="label-mono w-full min-w-0 bg-transparent py-1 outline-none placeholder:text-muted-ink"
-            />
-            <button type="submit" className="label-mono shrink-0 text-accent">
-              Go →
-            </button>
-          </form>
-        </div>
-      )}
     </header>
 
     {/* Mobile / tablet side menu — half-screen drawer (outside <header>: backdrop-filter would clip fixed positioning) */}
