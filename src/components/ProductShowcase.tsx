@@ -18,7 +18,7 @@ export function ProductShowcase({ content, preview = false, mobile = false, onPo
   }
   return <section className="bg-paper py-16 sm:py-24">
     <div className="mx-auto max-w-[1500px] px-4 sm:px-6">
-      <div className="mb-8 flex items-end justify-end border-b border-black/15 pb-4"><h2 className="display text-right text-[clamp(2rem,5vw,4.5rem)]">{content.heading}</h2></div>
+      <div className="mb-8 flex items-end justify-end border-b border-black/15 pb-4"><h2 className="display section-heading text-right">{content.heading}</h2></div>
       <div data-stage className={`relative mx-auto w-full max-w-5xl overflow-hidden bg-secondary ${mobile ? "aspect-[4/5]" : "aspect-[5/4] sm:aspect-[16/10]"}`}>
         <SiteMedia src={content.image} alt={content.imageAlt} className="absolute inset-0 h-full w-full object-cover" />
         <svg className="absolute inset-0 h-full w-full overflow-visible" aria-hidden="true">

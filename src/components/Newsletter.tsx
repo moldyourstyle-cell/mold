@@ -1,10 +1,10 @@
 export function Newsletter() {
   return (
     <section className="bg-ink text-paper">
-      <div className="mx-auto flex max-w-[1500px] flex-col items-start justify-between gap-8 px-4 py-16 sm:px-6 sm:py-20 md:flex-row md:items-end">
+      <div className="mx-auto flex max-w-[1500px] flex-col items-start justify-between gap-8 px-4 pb-16 pt-0 sm:px-6 sm:pb-20 sm:pt-0 md:flex-row md:items-end">
         <div>
           <span className="label-mono text-accent">Stay in the drop</span>
-          <h2 className="display mt-3 text-[clamp(2.5rem,7vw,5rem)]">
+          <h2 className="display section-heading mt-0">
             Don't miss
             <br />
             the next drop.

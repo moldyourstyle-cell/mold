@@ -16,7 +16,7 @@ export function CategoryCard({
     <Link
       to="/shop"
       search={{ category: slug }}
-      className="group relative block aspect-[295/443] overflow-hidden bg-secondary sm:aspect-[4/5]"
+      className="group relative block aspect-square overflow-hidden bg-secondary"
     >
       <img
         src={image}
@@ -28,7 +28,7 @@ export function CategoryCard({
         className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
       />
       <span className="absolute inset-0 bg-ink/25" />
-      <span className="display absolute bottom-5 left-5 text-4xl text-paper sm:text-5xl">
+      <span className="display absolute bottom-5 left-5 text-2xl text-paper sm:text-3xl">
         {name}
       </span>
       <span className="label-mono absolute bottom-6 right-5 text-paper">

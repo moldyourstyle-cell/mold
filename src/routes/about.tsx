@@ -26,7 +26,7 @@ export const Route = createFileRoute("/about")({
 
 function About() {
   return (
-    <>
+    <div className="font-nunito">
       <section className="relative">
         <img
           src={hero}
@@ -102,6 +102,6 @@ function About() {
           </h2>
         </div>
       </section>
-    </>
+    </div>
   );
 }

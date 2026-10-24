@@ -286,7 +286,7 @@ function Checkout() {
             <legend className="label-mono text-muted-ink">Payment</legend>
             <div className="mt-4 border border-line p-5">
               <div className="flex items-center gap-3">
-                <input type="radio" name="payment" checked readOnly className="accent-[oklch(0.652_0.238_33)]" />
+                <input type="radio" name="payment" checked readOnly className="accent-accent" />
                 <span className="text-sm font-semibold">Cash on delivery</span>
                 <span className="label-mono ml-auto text-muted-ink">₹49 handling fee</span>
               </div>

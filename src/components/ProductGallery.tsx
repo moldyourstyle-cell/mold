@@ -44,10 +44,10 @@ export function ProductGallery({ images, name }: { images: string[]; name: strin
             key={images[activeIndex]}
             src={images[activeIndex]}
             alt={`${name} — view ${activeIndex + 1}`}
-            width={1024}
-            height={1280}
+            width={400}
+            height={500}
             fetchPriority="high"
-            className="aspect-[4/5] w-full object-cover lg:aspect-[295/443]"
+            className="aspect-[4/5] w-full object-cover lg:aspect-[45/56]"
           />
         )}
 

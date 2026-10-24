@@ -62,7 +62,7 @@ export function HeroCarousel({ content }: { content: HeroContent }) {
             <div className="mt-1 flex flex-wrap gap-1.5 sm:mt-3 sm:gap-3 lg:mt-3">
               <a
                 href={slide.primaryHref}
-                className="inline-flex min-h-8 w-fit items-center justify-center bg-accent px-3 py-1.5 text-[8px] font-semibold uppercase tracking-[0.08em] text-ink transition-colors hover:bg-paper sm:min-h-10 sm:px-5 sm:py-2 sm:text-[10px] sm:tracking-[0.12em] lg:min-h-10 lg:px-5 lg:py-2"
+                className="font-nunito inline-flex min-h-7 w-fit items-center justify-center bg-accent px-2 py-1 text-[7px] font-semibold uppercase tracking-[0.08em] text-ink transition-colors hover:bg-paper sm:min-h-8 sm:px-4 sm:py-1.5 sm:text-[9px] sm:tracking-[0.12em] lg:min-h-8 lg:px-4 lg:py-1.5"
               >
                 {slide.primaryLabel}
               </a>

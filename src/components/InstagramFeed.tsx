@@ -10,7 +10,7 @@ export function InstagramFeed({ content }: { content: InstagramContent }) {
         <div className="flex flex-col gap-5 border-t border-paper/20 pt-5 sm:flex-row sm:items-end sm:justify-between">
           <div>
             <span className="label-mono text-paper/50">{content.eyebrow}</span>
-            <h2 className="display mt-3 text-[clamp(3rem,8vw,7rem)]">{content.title}</h2>
+            <h2 className="display section-heading mt-3">{content.title}</h2>
           </div>
           <a href={content.profileUrl} target="_blank" rel="noreferrer" className="label-mono flex items-center gap-2 text-accent hover:text-paper">
             {content.handle} <ExternalLink className="h-3.5 w-3.5" />

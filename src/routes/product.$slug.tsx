@@ -112,7 +112,7 @@ function ProductPage() {
 
 
   return (
-    <div className="mx-auto max-w-[1500px] px-4 py-8 sm:px-6 sm:py-12">
+    <div className="font-nunito mx-auto max-w-[1500px] px-4 py-8 sm:px-6 sm:py-12">
       <nav className="label-mono mb-6 text-muted-ink">
         <Link to="/shop" className="hover:text-ink">
           Shop

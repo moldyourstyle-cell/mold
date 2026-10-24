@@ -145,7 +145,7 @@ export function Header({ transparentOnHome = false }: { transparentOnHome?: bool
         />
         {/* Drawer */}
         <div
-          className={`absolute left-0 top-0 flex h-full w-[50vw] min-w-[260px] max-w-[380px] flex-col bg-ink text-paper shadow-2xl transition-transform duration-300 ease-out ${
+          className={`absolute left-0 top-0 flex h-full w-[min(70vw,320px)] flex-col bg-ink text-paper shadow-2xl transition-transform duration-300 ease-out ${
             menuOpen ? "translate-x-0" : "-translate-x-full"
           }`}
         >
@@ -159,14 +159,14 @@ export function Header({ transparentOnHome = false }: { transparentOnHome?: bool
               <X className="h-5 w-5" />
             </button>
           </div>
-          <nav className="flex-1 overflow-y-auto px-5 py-4">
+          <nav className="flex-1 overflow-y-auto px-5 py-2">
             {navLinks.map((l) => (
               <Link
                 key={l.label}
                 to={l.to}
                 search={l.search}
                 onClick={() => setMenuOpen(false)}
-                className="display flex items-center border-b border-paper/10 py-3.5 text-2xl"
+                className="font-nunito flex min-h-[23px] items-center border-b border-paper/10 py-1.5 text-[23px] font-semibold uppercase leading-[23px]"
               >
                 {l.label}
                 {l.label === "Clearance Sale" && <span aria-hidden="true" className="ml-2 h-2 w-2 animate-pulse rounded-full bg-red-500" />}
@@ -175,21 +175,21 @@ export function Header({ transparentOnHome = false }: { transparentOnHome?: bool
             <Link
               to="/lookbook"
               onClick={() => setMenuOpen(false)}
-              className="display block border-b border-paper/10 py-3.5 text-2xl"
+              className="font-nunito block min-h-[23px] border-b border-paper/10 py-1.5 text-[23px] font-semibold uppercase leading-[23px]"
             >
               Lookbook
             </Link>
             <Link
               to="/track"
               onClick={() => setMenuOpen(false)}
-              className="display block border-b border-paper/10 py-3.5 text-2xl"
+              className="font-nunito block min-h-[23px] border-b border-paper/10 py-1.5 text-[23px] font-semibold uppercase leading-[23px]"
             >
               Track order
             </Link>
             <Link
               to="/about"
               onClick={() => setMenuOpen(false)}
-              className="display block border-b border-paper/10 py-3.5 text-2xl"
+              className="font-nunito block min-h-[23px] border-b border-paper/10 py-1.5 text-[23px] font-semibold uppercase leading-[23px]"
             >
               Our Story
             </Link>
@@ -197,14 +197,14 @@ export function Header({ transparentOnHome = false }: { transparentOnHome?: bool
             <Link
               to="/account"
               onClick={() => setMenuOpen(false)}
-              className="label-mono block pt-5 text-paper/60"
+              className="font-nunito block pt-5 text-sm text-paper/60"
             >
               Account
             </Link>
             <Link
               to="/wishlist"
               onClick={() => setMenuOpen(false)}
-              className="label-mono block py-4 text-paper/60"
+              className="font-nunito block py-2 text-sm text-paper/60"
             >
               Wishlist · {wishlist.length}
             </Link>

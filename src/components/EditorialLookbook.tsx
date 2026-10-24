@@ -11,10 +11,9 @@ export function EditorialLookbook({ content, compact = false }: { content: Lookb
   return (
     <section className={compact ? "pb-16 pt-0 sm:pb-24" : "py-10 sm:py-20"}>
       <div className="mx-auto max-w-[1500px] px-4 sm:px-6">
-        <div className="grid gap-6 border-t border-line pt-5 lg:grid-cols-[1fr_2fr] lg:items-end">
-          <div className="label-mono text-muted-ink">{content.eyebrow}</div>
+        <div className="border-t border-line pt-0">
           <div className="flex flex-col gap-3 lg:flex-row lg:items-end lg:justify-between">
-            <h2 className="display max-w-[12ch] text-[clamp(3rem,8vw,8rem)]">{content.title}</h2>
+            <h2 className="display section-heading">{content.title}</h2>
             <span className="label-mono shrink-0 text-muted-ink">{content.season}</span>
           </div>
         </div>

@@ -21,7 +21,7 @@ export function ProductDetailEditorial({ content, preview = false, mobile = fals
     window.addEventListener("pointermove", move); window.addEventListener("pointerup", done, { once: true });
   }
   return (
-    <section className={`${preview ? "my-20" : "my-0"} border-y border-line py-10 sm:py-14`}>
+    <section className={`${preview ? "my-20" : "my-0"} border-y border-line pb-0 pt-10 sm:pb-0 sm:pt-14`}>
       <div className="mx-auto grid max-w-[1300px] grid-cols-2 items-center gap-x-4 gap-y-8 px-4 sm:px-6 md:gap-x-6 md:gap-y-10 lg:grid-cols-[1fr_1fr_0.9fr] lg:gap-8 xl:gap-12">
         {hasVideo && <figure className="relative aspect-[4/5] overflow-hidden bg-secondary">
           <SiteMedia src={content.detailVideo} alt="MOLD editorial film" className="h-full w-full object-cover" />
