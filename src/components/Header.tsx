@@ -104,7 +104,7 @@ export function Header({ transparentOnHome = false }: { transparentOnHome?: bool
           <Link
             to="/account"
             aria-label="Account"
-            className="hidden p-2 transition-colors hover:text-accent sm:block"
+            className="p-2 transition-colors hover:text-accent"
           >
             <User className="h-[18px] w-[18px]" />
           </Link>
