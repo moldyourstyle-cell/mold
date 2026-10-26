@@ -237,9 +237,9 @@ function ProductPage() {
         <h2 className="display mb-8 border-b border-line pb-5 text-3xl">You may also like</h2>
         <ProductGrid
           products={relatedProducts(products, product)}
-          boxClassName="w-[250px] max-w-full"
-          imageClassName="h-[310px] w-full"
-          gridClassName="grid-cols-[repeat(auto-fill,250px)] gap-x-2 sm:gap-x-3 lg:gap-x-2"
+          boxClassName="w-full min-w-0 sm:w-[250px]"
+          imageClassName="aspect-[4/5] w-full sm:aspect-auto sm:h-[310px]"
+          gridClassName="grid-cols-2 gap-x-3 sm:grid-cols-[repeat(auto-fill,250px)] sm:gap-x-3 lg:gap-x-2"
         />
       </section>
     </div>

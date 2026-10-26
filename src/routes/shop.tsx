@@ -69,7 +69,7 @@ function Shop() {
     if (search.sale && !p.isClearanceSale) return false;
     if (search.inStock && p.stock === 0) return false;
     if (p.price < (search.minPrice ?? 0)) return false;
-    if (p.price > (search.maxPrice ?? 500)) return false;
+    if (search.maxPrice !== undefined && p.price > search.maxPrice) return false;
     if (search.q) {
       const q = search.q.toLowerCase();
       const hay = `${p.name} ${p.category} ${p.tags.join(" ")}`.toLowerCase();
@@ -119,23 +119,32 @@ function Shop() {
           <label className="flex items-center gap-2">
             <span className="label-mono text-muted-ink">Price range</span>
             <select
-              value={`${search.minPrice ?? 0}-${search.maxPrice ?? 500}`}
+              value={
+                search.minPrice === undefined && search.maxPrice === undefined
+                  ? "all"
+                  : `${search.minPrice ?? 0}-${search.maxPrice ?? ""}`
+              }
               onChange={(e) => {
+                if (e.target.value === "all") {
+                  setSearch({ minPrice: undefined, maxPrice: undefined });
+                  return;
+                }
                 const [min, max] = e.target.value.split("-").map(Number);
                 setSearch({
                   minPrice: min === 0 ? undefined : min,
-                  maxPrice: max === 6000 ? undefined : max,
+                  maxPrice: max || undefined,
                 });
               }}
               className="label-mono border border-line bg-paper px-2 py-1.5 text-ink"
             >
+              <option value="all">All prices</option>
               <option value="0-500">₹0–₹500</option>
               <option value="500-1000">₹500–₹1,000</option>
               <option value="1000-2000">₹1,000–₹2,000</option>
               <option value="2000-3000">₹2,000–₹3,000</option>
               <option value="3000-4000">₹3,000–₹4,000</option>
               <option value="4000-5000">₹4,000–₹5,000</option>
-              <option value="5000-6000">₹5,000–₹6,000</option>
+              <option value="5000-">₹5,000+</option>
             </select>
           </label>
 
