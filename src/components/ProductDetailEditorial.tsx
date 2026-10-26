@@ -1,11 +1,25 @@
+import { useRef, useState } from "react";
 import { SiteMedia } from "@/components/SiteMedia";
 import { isUploadedMedia, type ProductShowcaseContent } from "@/lib/site-content";
 
 export function ProductDetailEditorial({ content, preview = false, mobile = false, onFeaturePosition }: { content: ProductShowcaseContent; preview?: boolean; mobile?: boolean; onFeaturePosition?: (index: number, key: "x" | "y" | "tx" | "ty", value: number) => void }) {
+  const [touchPreviewActive, setTouchPreviewActive] = useState(false);
+  const touchPreviewTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const hasVideo = isUploadedMedia(content.detailVideo);
   const hasImage = isUploadedMedia(content.image);
   const hasHoverImage = isUploadedMedia(content.hoverImage);
   if (!preview && !hasVideo && !hasImage) return null;
+  function startTouchPreview(event: React.PointerEvent<HTMLDivElement>) {
+    if (preview || event.pointerType !== "touch" || !hasHoverImage) return;
+    touchPreviewTimer.current = setTimeout(() => setTouchPreviewActive(true), 1000);
+  }
+  function stopTouchPreview() {
+    if (touchPreviewTimer.current) {
+      clearTimeout(touchPreviewTimer.current);
+      touchPreviewTimer.current = null;
+    }
+    setTouchPreviewActive(false);
+  }
   function dragFeature(event: React.PointerEvent<HTMLElement>, index: number, target: "point" | "text") {
     if (!preview || !onFeaturePosition) return;
     event.preventDefault();
@@ -28,9 +42,18 @@ export function ProductDetailEditorial({ content, preview = false, mobile = fals
           <figcaption className="label-mono absolute bottom-4 left-4 text-paper drop-shadow">MOLD — IN MOTION</figcaption>
         </figure>}
         {hasImage && <figure className="relative aspect-[4/5] bg-secondary">
-          <div data-image-stage className="group relative h-full w-full overflow-hidden">
+          <div
+            data-image-stage
+            className="group relative h-full w-full overflow-hidden"
+            data-touch-preview={touchPreviewActive ? "true" : undefined}
+            onPointerDown={startTouchPreview}
+            onPointerUp={stopTouchPreview}
+            onPointerCancel={stopTouchPreview}
+            onPointerLeave={stopTouchPreview}
+            onContextMenu={(event) => event.preventDefault()}
+          >
             <SiteMedia src={content.image} alt={content.imageAlt} className="absolute inset-0 h-full w-full object-cover" />
-            {hasHoverImage && <SiteMedia src={content.hoverImage} alt={`${content.imageAlt} — alternate view`} className="absolute inset-0 h-full w-full object-cover opacity-0 transition-opacity duration-700 ease-out group-hover:opacity-100 group-focus-within:opacity-100" />}
+            {hasHoverImage && <SiteMedia src={content.hoverImage} alt={`${content.imageAlt} — alternate view`} className="absolute inset-0 h-full w-full object-cover opacity-0 transition-opacity duration-700 ease-out group-hover:opacity-100 group-focus-within:opacity-100 group-data-[touch-preview=true]:opacity-100" />}
             {(preview ? [mobile] : [false, true]).map((isMobile) => <div key={String(isMobile)} className={preview ? "" : isMobile ? "lg:hidden" : "hidden lg:block"}>
               <svg className="absolute inset-0 h-full w-full" aria-hidden="true">{content.features.map((item, i) => { const p = item[isMobile ? "mobile" : "desktop"]; return item.enabled && item.lineEnabled ? <g key={i}><line x1={`${p.x}%`} y1={`${p.y}%`} x2={`${p.tx}%`} y2={`${p.ty}%`} stroke="currentColor" strokeOpacity=".8" strokeWidth="1" /><circle cx={`${p.x}%`} cy={`${p.y}%`} r="3" fill="currentColor" /></g> : null; })}</svg>
               {content.features.map((item, i) => { const p = item[isMobile ? "mobile" : "desktop"]; return item.enabled ? <span key={`label-${i}`} style={{ left: `${p.tx}%`, top: `${p.ty}%` }} onPointerDown={(e) => dragFeature(e, i, "text")} className={`absolute z-10 -translate-y-1/2 text-ink ${preview ? "cursor-move bg-paper/90 p-2" : "bg-paper/75 px-1.5 py-1"}`}><span className="label-mono block max-w-32 text-[8px] leading-relaxed sm:text-[9px]">{item.text}</span></span> : null; })}
