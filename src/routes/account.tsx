@@ -4,7 +4,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { site } from "@/config/site";
 import { formatINR } from "@/lib/format";
 import { supabase } from "@/integrations/supabase/client";
-import { myOrders, type MyOrder } from "@/lib/orders.functions";
+import { cancelMyOrder, myOrders, type MyOrder } from "@/lib/orders.functions";
 import { OrderStatusTimeline, ORDER_STATUS_LABELS } from "@/components/OrderStatusTimeline";
 import { useCatalog } from "@/lib/catalog";
 import { useStore } from "@/lib/store";
@@ -42,6 +42,7 @@ type Tab = "orders" | "wishlist" | "addresses" | "settings";
 
 function Account() {
   const fetchOrders = useServerFn(myOrders);
+  const cancelOrder = useServerFn(cancelMyOrder);
   const navigate = useNavigate();
   const [email, setEmail] = useState<string | null>(null);
   const [checking, setChecking] = useState(true);
@@ -50,6 +51,23 @@ function Account() {
   const [error, setError] = useState(false);
   const [selected, setSelected] = useState<string | null>(null);
   const [tab, setTab] = useState<Tab>("orders");
+  const [cancelling, setCancelling] = useState(false);
+  const [orderMessage, setOrderMessage] = useState("");
+
+  async function handleCancelOrder(orderNumber: string) {
+    if (!window.confirm("Cancel this order?")) return;
+    setCancelling(true);
+    setOrderMessage("");
+    try {
+      await cancelOrder({ data: orderNumber });
+      setOrders((rows) => rows.map((order) => order.orderNumber === orderNumber ? { ...order, status: "cancelled" } : order));
+      setOrderMessage("Your order has been cancelled.");
+    } catch (failure) {
+      setOrderMessage(failure instanceof Error ? failure.message : "Could not cancel this order.");
+    } finally {
+      setCancelling(false);
+    }
+  }
 
   useEffect(() => {
     let cancelled = false;
@@ -167,6 +185,9 @@ function Account() {
               error={error}
               current={current}
               setSelected={setSelected}
+              onCancel={handleCancelOrder}
+              cancelling={cancelling}
+              message={orderMessage}
             />
           )}
           {tab === "wishlist" && <WishlistPanel />}
@@ -184,12 +205,18 @@ function OrdersPanel({
   error,
   current,
   setSelected,
+  onCancel,
+  cancelling,
+  message,
 }: {
   orders: MyOrder[];
   loading: boolean;
   error: boolean;
   current: MyOrder | null;
   setSelected: (v: string | null) => void;
+  onCancel: (orderNumber: string) => void;
+  cancelling: boolean;
+  message: string;
 }) {
   return (
     <section>
@@ -206,6 +233,7 @@ function OrdersPanel({
           We couldn&apos;t load your orders right now. Please refresh and try again.
         </p>
       )}
+      {message && <p className="mt-4 text-sm text-muted-ink" role="status">{message}</p>}
 
       {!loading && !error && orders.length === 0 && (
         <div className="mt-6 grid min-h-[320px] place-items-center border border-line px-6 py-14 text-center">
@@ -259,7 +287,10 @@ function OrdersPanel({
                 </div>
                 <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-4 border-t border-line px-4 py-4 sm:px-6">
                   <div><span className="label-mono text-muted-ink">Total amount</span><p className="mt-1 text-lg font-bold">{formatINR(order.total)}</p></div>
-                  <Button type="button" onClick={() => setSelected(order.orderNumber)} className="h-11 rounded-none px-5 text-[10px] font-bold uppercase tracking-[0.14em]">View order</Button>
+                  <div className="flex flex-wrap justify-end gap-2">
+                    {order.status === "pending" && <Button type="button" variant="outline" disabled={cancelling} onClick={() => onCancel(order.orderNumber)} className="h-11 rounded-none px-5 text-[10px] font-bold uppercase tracking-[0.14em]">Cancel order</Button>}
+                    <Button type="button" onClick={() => setSelected(order.orderNumber)} className="h-11 rounded-none px-5 text-[10px] font-bold uppercase tracking-[0.14em]">View order</Button>
+                  </div>
                 </div>
               </div>
             </li>
@@ -359,6 +390,7 @@ function OrdersPanel({
             <div>
               <p className="label-mono text-muted-ink">Status</p>
               <OrderStatusTimeline status={current.status} />
+              {current.status === "pending" && <Button type="button" variant="outline" disabled={cancelling} onClick={() => onCancel(current.orderNumber)} className="mt-3 h-11 rounded-none px-5 text-[10px] font-bold uppercase tracking-[0.14em]">Cancel order</Button>}
               {current.status !== "cancelled" && current.status !== "delivered" && (
                 <Link
                   to="/track"

@@ -545,3 +545,31 @@ export const myOrders = createServerFn({ method: "GET" })
       })),
     }));
   });
+
+/** A shopper may cancel only their own order while it is still pending. */
+export const cancelMyOrder = createServerFn({ method: "POST" })
+  .validator((orderNumber: string) => z.string().min(1).max(100).parse(orderNumber))
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context, data: orderNumber }) => {
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const email = String((context.claims as { email?: string })?.email ?? "").trim().toLowerCase();
+    const filters = [`user_id.eq.${context.userId}`];
+    if (email) filters.push(`email.eq.${email}`);
+
+    const { data: order, error } = await supabaseAdmin
+      .from("orders")
+      .update({ status: "cancelled" })
+      .eq("order_number", orderNumber)
+      .eq("status", "pending")
+      .or(filters.join(","))
+      .select("id")
+      .maybeSingle();
+    if (error) throw new Error(error.message);
+    if (!order) throw new Error("This order can no longer be cancelled. Only pending orders can be cancelled.");
+
+    const { error: restoreError } = await (supabaseAdmin as unknown as {
+      rpc: (fn: string, args: Record<string, unknown>) => Promise<{ error: { message: string } | null }>;
+    }).rpc("restore_order_stock", { _order_id: order.id });
+    if (restoreError) throw new Error(restoreError.message);
+    return { ok: true };
+  });
