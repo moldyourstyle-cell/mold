@@ -189,14 +189,6 @@ export function Header({ transparentOnHome = false }: { transparentOnHome?: bool
               Track order
             </Link>
             <Link
-              to="/about"
-              onClick={() => setMenuOpen(false)}
-              className="font-nunito block min-h-[23px] border-b border-paper/10 py-1.5 text-[23px] font-semibold uppercase leading-[23px]"
-            >
-              Our Story
-            </Link>
-
-            <Link
               to="/account"
               onClick={() => setMenuOpen(false)}
               className="font-nunito block pt-5 text-sm text-paper/60"

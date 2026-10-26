@@ -188,11 +188,6 @@ function Shop() {
       <p className="label-mono py-6 text-muted-ink">{list.length} pieces</p>
       <ProductGrid products={list} />
 
-      <div className="mt-16 border-t border-line pt-8">
-        <Link to="/about" className="label-mono hover:text-accent">
-          Read the MOLD story →
-        </Link>
-      </div>
     </div>
   );
 }
