@@ -87,9 +87,9 @@ export function ProductCard({ product, priority, boxClassName, imageClassName }:
         <button
           onClick={() => toggleWishlist(product.id)}
           aria-label={wished ? "Remove from wishlist" : "Add to wishlist"}
-          className="absolute bottom-2 right-2 rounded-full bg-paper/90 p-1.5 transition-colors hover:text-accent"
+          className="absolute bottom-2 right-2 rounded-full bg-paper/90 p-1.5 transition-colors hover:text-accent sm:p-2"
         >
-          <Heart className={`h-3.5 w-3.5 ${wished ? "fill-accent text-accent" : ""}`} />
+          <Heart className={`h-3.5 w-3.5 sm:h-4 sm:w-4 ${wished ? "fill-accent text-accent" : ""}`} />
         </button>
 
         {!soldOut && (
