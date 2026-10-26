@@ -190,23 +190,23 @@ function ProductPage() {
             </span>
           </div>
 
-          <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+          <div className="mt-8 flex flex-row gap-2 sm:gap-3">
             <button
               disabled={soldOut}
               onClick={handleAdd}
-              className="w-3/4 max-w-full flex-[0_1_70%] bg-ink py-4 text-[11px] font-semibold uppercase tracking-[0.14em] text-paper transition-colors hover:bg-accent hover:text-ink disabled:opacity-40"
+              className="min-w-0 flex-1 bg-ink py-4 text-[10px] font-semibold uppercase tracking-[0.1em] text-paper transition-colors hover:bg-accent hover:text-ink disabled:opacity-40 sm:text-[11px] sm:tracking-[0.14em]"
             >
               {soldOut ? "Out of stock" : "Add to cart"}
             </button>
             <button
               onClick={() => toggleWishlist(product.id)}
               aria-label="Wishlist"
-              className="flex items-center justify-center gap-2 border border-ink px-5 py-4 text-[11px] font-semibold uppercase tracking-[0.14em] transition-colors hover:bg-ink hover:text-paper"
+              className="flex w-12 shrink-0 items-center justify-center border border-ink px-2 py-3 text-[10px] font-semibold uppercase tracking-[0.1em] transition-colors hover:bg-ink hover:text-paper sm:w-auto sm:gap-2 sm:px-5 sm:py-4 sm:text-[11px] sm:tracking-[0.14em]"
             >
               <Heart
                 className={`h-4 w-4 ${wishlist.includes(product.id) ? "fill-accent text-accent" : ""}`}
               />
-              Wishlist
+              <span className="hidden sm:inline">Wishlist</span>
             </button>
           </div>
           <button

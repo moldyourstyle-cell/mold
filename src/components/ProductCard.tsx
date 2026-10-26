@@ -84,30 +84,12 @@ export function ProductCard({ product, priority, boxClassName, imageClassName }:
           </span>
         )}
 
-        <div className="absolute inset-x-2 bottom-2 flex items-center gap-2 sm:hidden">
-          {!soldOut && (
-            <button
-              onClick={() => addToCart(product.id, product.sizes[Math.min(1, product.sizes.length - 1)] ?? "M")}
-              className="min-h-9 flex-1 rounded-md bg-ink/80 px-3 py-2 text-[10px] font-semibold uppercase tracking-[0.12em] text-paper shadow-sm backdrop-blur-sm"
-            >
-              Add to cart
-            </button>
-          )}
-          <button
-            onClick={() => toggleWishlist(product.id)}
-            aria-label={wished ? "Remove from wishlist" : "Add to wishlist"}
-            className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-paper/90 transition-colors hover:text-accent"
-          >
-            <Heart className={`h-3.5 w-3.5 ${wished ? "fill-accent text-accent" : ""}`} />
-          </button>
-        </div>
-
         <button
           onClick={() => toggleWishlist(product.id)}
           aria-label={wished ? "Remove from wishlist" : "Add to wishlist"}
-          className="absolute bottom-2 right-2 hidden rounded-full bg-paper/90 p-2 transition-colors hover:text-accent sm:block"
+          className="absolute bottom-2 right-2 rounded-full bg-paper/90 p-1.5 transition-colors hover:text-accent sm:p-2"
         >
-          <Heart className={`h-4 w-4 ${wished ? "fill-accent text-accent" : ""}`} />
+          <Heart className={`h-3.5 w-3.5 sm:h-4 sm:w-4 ${wished ? "fill-accent text-accent" : ""}`} />
         </button>
 
         {!soldOut && (
