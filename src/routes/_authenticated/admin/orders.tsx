@@ -186,6 +186,7 @@ function AdminOrders() {
                               width={80}
                               height={100}
                               loading="lazy"
+                              decoding="async"
                               className="h-14 w-12 shrink-0 object-cover"
                             />
                           )}

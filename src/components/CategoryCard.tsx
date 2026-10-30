@@ -5,11 +5,13 @@ export function CategoryCard({
   slug,
   name,
   image,
+  srcSet,
   count,
 }: {
   slug: CategorySlug;
   name: string;
   image: string;
+  srcSet: string;
   count: number;
 }) {
   return (
@@ -20,6 +22,8 @@ export function CategoryCard({
     >
       <img
         src={image}
+        srcSet={srcSet}
+        sizes="50vw"
         alt={`Shop MOLD ${name}`}
         width={1024}
         height={1280}
@@ -32,10 +36,16 @@ export function CategoryCard({
         {name}
       </span>
       <span className="label-mono absolute bottom-6 right-5 text-paper">
-        {String(count).padStart(2, "0")} ·{" "}
-        <span className="inline-block text-accent transition-transform group-hover:translate-x-1">
-          →
-        </span>
+        {count === 0 ? (
+          <span className="text-accent">Coming soon</span>
+        ) : (
+          <>
+            {String(count).padStart(2, "0")} ·{" "}
+            <span className="inline-block text-accent transition-transform group-hover:translate-x-1">
+              →
+            </span>
+          </>
+        )}
       </span>
     </Link>
   );

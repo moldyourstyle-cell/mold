@@ -10,6 +10,7 @@ import { useCatalog } from "@/lib/catalog";
 import { useStore } from "@/lib/store";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { mediaSrcSet } from "@/lib/media";
 import { Label } from "@/components/ui/label";
 import { deleteSavedAddress, listSavedAddresses, saveAddress, type SavedAddress } from "@/lib/saved-addresses.functions";
 
@@ -267,10 +268,13 @@ function OrdersPanel({
                       {item.image && (
                         <img
                           src={item.image}
+                          srcSet={mediaSrcSet(item.image)}
+                          sizes="88px"
                           alt={item.productName}
                           width={120}
                           height={150}
                           loading="lazy"
+                          decoding="async"
                           className="h-24 w-[72px] shrink-0 object-cover sm:h-28 sm:w-[88px]"
                         />
                       )}
@@ -323,10 +327,13 @@ function OrdersPanel({
                   {item.image && (
                     <img
                       src={item.image}
+                      srcSet={mediaSrcSet(item.image)}
+                      sizes="64px"
                       alt={item.productName}
                       width={120}
                       height={150}
                       loading="lazy"
+                      decoding="async"
                       className="h-20 w-16 shrink-0 object-cover"
                     />
                   )}
@@ -443,10 +450,13 @@ function WishlistPanel() {
                   {p.images?.[0] && (
                     <img
                       src={p.images[0]}
+                      srcSet={mediaSrcSet(p.images[0]!)}
+                      sizes="(max-width: 639px) 50vw, 25vw"
                       alt={p.name}
                       width={400}
                       height={533}
                       loading="lazy"
+                      decoding="async"
                       className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.03]"
                     />
                   )}

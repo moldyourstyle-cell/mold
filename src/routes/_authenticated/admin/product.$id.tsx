@@ -344,7 +344,10 @@ function ProductFormPage() {
                   <img
                     src={img}
                     alt={`${form.name || "Product"} image ${index + 1}`}
+                    width={600}
+                    height={750}
                     loading="lazy"
+                    decoding="async"
                     className="h-full w-full object-cover"
                   />
                   {index === 0 && (

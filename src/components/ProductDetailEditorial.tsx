@@ -38,7 +38,7 @@ export function ProductDetailEditorial({ content, preview = false, mobile = fals
     <section className={`${preview ? "my-20" : "my-0"} border-y border-line pb-0 pt-10 sm:pb-0 sm:pt-14`}>
       <div className="mx-auto grid max-w-[1300px] grid-cols-2 items-center gap-x-4 gap-y-8 px-4 sm:px-6 md:gap-x-6 md:gap-y-10 lg:grid-cols-[1fr_1fr_0.9fr] lg:gap-8 xl:gap-12">
         {hasVideo && <figure className="relative aspect-[4/5] overflow-hidden bg-secondary">
-          <SiteMedia src={content.detailVideo} alt="MOLD editorial film" className="h-full w-full object-cover" />
+          <SiteMedia src={content.detailVideo} poster={content.image || "/products/hero-800.webp"} alt="MOLD editorial film" className="h-full w-full object-cover" />
           <figcaption className="label-mono absolute bottom-4 left-4 text-paper drop-shadow">MOLD — IN MOTION</figcaption>
         </figure>}
         {hasImage && <figure className="relative aspect-[4/5] bg-secondary">

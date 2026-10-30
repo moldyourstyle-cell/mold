@@ -115,7 +115,9 @@ export function Header({ transparentOnHome = false }: { transparentOnHome?: bool
           >
             <Heart className="h-[18px] w-[18px]" />
             {wishlist.length > 0 && (
-              <span className="absolute right-0 top-0 h-1.5 w-1.5 bg-accent" />
+              <span className="label-mono absolute -right-1 -top-1 min-w-4 bg-accent px-1 text-center text-[10px] leading-4 text-ink">
+                {wishlist.length}
+              </span>
             )}
           </Link>
           <button

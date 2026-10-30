@@ -1,4 +1,4 @@
-import { createFileRoute, Link, notFound, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link, notFound, redirect, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { Heart } from "lucide-react";
@@ -14,6 +14,9 @@ import { ProductGrid } from "@/components/ProductGrid";
 
 export const Route = createFileRoute("/product/$slug")({
   loader: async ({ params, context }) => {
+    if (params.slug === "outdoorin") {
+      throw redirect({ to: "/product/$slug", params: { slug: "outdoor-jacket" }, statusCode: 301 });
+    }
     const products = await context.queryClient.ensureQueryData(catalogQuery);
     const product = getProduct(products, params.slug);
     if (!product) throw notFound();

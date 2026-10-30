@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { SiteMedia } from "@/components/SiteMedia";
 import { EditorialLookbook } from "@/components/EditorialLookbook";
-import { InstagramFeed } from "@/components/InstagramFeed";
+import { DeferredInstagramFeed } from "@/components/DeferredInstagramFeed";
 import { siteContentQuery, useSiteContent } from "@/lib/content";
 
 export const Route = createFileRoute("/lookbook")({
@@ -27,7 +27,7 @@ function LookbookPage() {
   return (
     <>
       <section className="relative min-h-[68vh] overflow-hidden bg-ink text-paper">
-        <SiteMedia src={lead?.url ?? hero.image ?? ""} alt={lead?.alt ?? hero.imageAlt ?? ""} eager className="absolute inset-0 h-full w-full object-cover opacity-65" />
+        <SiteMedia src={lead?.url ?? hero.image ?? ""} alt={lead?.alt ?? hero.imageAlt ?? ""} className="absolute inset-0 h-full w-full object-cover opacity-65" />
         <div className="absolute inset-0 bg-ink/35" />
         <div className="relative mx-auto flex min-h-[68vh] max-w-[1500px] flex-col justify-end px-4 pb-10 pt-28 sm:px-6 sm:pb-16">
           <span className="label-mono text-paper/70">{lookbook.eyebrow} / {lookbook.season}</span>
@@ -44,7 +44,7 @@ function LookbookPage() {
           </div>
         </div>
       </section>
-      <InstagramFeed content={instagram} />
+      <DeferredInstagramFeed content={instagram} />
     </>
   );
 }

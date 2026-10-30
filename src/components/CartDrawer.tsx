@@ -5,6 +5,7 @@ import { X } from "lucide-react";
 import { useStore } from "@/lib/store";
 import { formatINR } from "@/lib/format";
 import { reserveItems } from "@/lib/reservation";
+import { mediaSrcSet } from "@/lib/media";
 
 export function CartDrawer() {
   const { cartOpen, setCartOpen, detailedLines, subtotal, shipping, total, freeShippingThreshold, setQty, removeLine } =
@@ -81,10 +82,13 @@ export function CartDrawer() {
               >
                 <img
                   src={product.images[0]}
+                  srcSet={mediaSrcSet(product.images[0]!)}
+                  sizes="80px"
                   alt={product.name}
                   width={200}
                   height={250}
                   loading="lazy"
+                  decoding="async"
                   className="h-24 w-20 shrink-0 object-cover"
                 />
                 <div className="min-w-0 flex-1">

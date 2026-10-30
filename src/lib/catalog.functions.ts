@@ -6,18 +6,27 @@ import type { CategorySlug, Product } from "@/data/products";
 type Row = Database["public"]["Tables"]["products"]["Row"];
 
 export function rowToProduct(row: Row): Product {
+  const cleanName = row.name.trim().replace(/\s+/g, " ");
+  const titleName = cleanName.replace(/\b\p{L}[\p{L}'’-]*/gu, (word) =>
+    word.charAt(0).toLocaleUpperCase("en-IN") + word.slice(1).toLocaleLowerCase("en-IN"),
+  );
+  const cleanCopy = (value: string) => value
+    .replace(/Fit for your comfortable/gi, "Made for comfort")
+    .replace(/Wide leg baggy feel free moment/gi, "Wide-leg, baggy, built for movement");
   return {
     id: row.id,
-    slug: row.slug,
-    name: row.name,
+    slug: ["outdoorin", "outdoor"].includes(row.slug) ? "outdoor-jacket" : row.slug,
+    name: ["outdoorin", "outdoor"].includes(row.slug) || cleanName.toLowerCase() === "outdoor"
+      ? "Outdoor Jacket"
+      : titleName,
     category: row.category as CategorySlug,
     price: row.price,
     compareAtPrice: row.compare_at_price ?? undefined,
     images: row.images,
     sizes: row.sizes,
-    description: row.description,
+    description: cleanCopy(row.description),
     fabric: row.fabric,
-    fit: row.fit,
+    fit: cleanCopy(row.fit),
     stock: row.stock,
     sku: row.sku,
     tags: row.tags,

@@ -101,7 +101,7 @@ export function normalizeHero(hero: HeroContent | undefined | null): {
 export function isUploadedMedia(url: string | undefined | null): boolean {
   const value = url?.trim();
   if (!value) return false;
-  return !/^\/?(?:editorial\/)?mold-(?:hero|look-[123])\.jpg(?:[?#].*)?$/i.test(value);
+  return !/^\/?(?:editorial\/)?mold-(?:hero|look-[123])\.(?:jpe?g|webp)(?:[?#].*)?$/i.test(value);
 }
 
 export const defaultSiteContent: SiteContent = {

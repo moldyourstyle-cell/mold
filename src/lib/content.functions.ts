@@ -50,7 +50,21 @@ function mergeRows(rows: Array<{ section_key: string; content: Json }>): SiteCon
     if (row.section_key === "showcase") next.showcase = row.content as SiteContent["showcase"];
   }
   next.showcase = { ...defaultSiteContent.showcase, ...next.showcase };
-  return next;
+  const normalizeText = (value: unknown): unknown => {
+    if (typeof value === "string") {
+      return value
+        .replace(/MOLD Jackets for prefect streetwear/gi, "MOLD jackets, perfect streetwear")
+        .replace(/Products\s*\|\s*Place/gi, "Products & Place")
+        .replace(/Fit for your comfortable/gi, "Made for comfort")
+        .replace(/Wide leg baggy feel free moment/gi, "Wide-leg, baggy, built for movement");
+    }
+    if (Array.isArray(value)) return value.map(normalizeText);
+    if (value && typeof value === "object") {
+      return Object.fromEntries(Object.entries(value).map(([key, entry]) => [key, normalizeText(entry)]));
+    }
+    return value;
+  };
+  return normalizeText(next) as SiteContent;
 }
 
 export const getSiteContent = createServerFn({ method: "GET" }).handler(async () => {

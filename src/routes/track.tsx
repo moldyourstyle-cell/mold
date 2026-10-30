@@ -4,6 +4,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { formatINR } from "@/lib/format";
 import { trackOrder, type OrderStatus, type TrackedOrder } from "@/lib/orders.functions";
 import { getRecentOrders } from "@/lib/recent-orders";
+import { mediaSrcSet } from "@/lib/media";
 
 export const Route = createFileRoute("/track")({
   head: () => ({
@@ -110,10 +111,13 @@ function OrderCard({ order }: { order: TrackedOrder }) {
               {item.image && (
                 <img
                   src={item.image}
+                  srcSet={mediaSrcSet(item.image)}
+                  sizes="56px"
                   alt={item.productName}
                   width={120}
                   height={150}
                   loading="lazy"
+                  decoding="async"
                   className="h-16 w-14 shrink-0 object-cover"
                 />
               )}

@@ -4,6 +4,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useStore } from "@/lib/store";
 import { formatINR } from "@/lib/format";
 import { reserveItems } from "@/lib/reservation";
+import { mediaSrcSet } from "@/lib/media";
 
 
 export const Route = createFileRoute("/cart")({
@@ -74,10 +75,13 @@ function CartPage() {
                 <Link to="/product/$slug" params={{ slug: product.slug }} className="shrink-0">
                   <img
                     src={product.images[0]}
+                    srcSet={mediaSrcSet(product.images[0]!)}
+                    sizes="96px"
                     alt={product.name}
                     width={200}
                     height={250}
                     loading="lazy"
+                    decoding="async"
                     className="h-32 w-24 object-cover"
                   />
                 </Link>

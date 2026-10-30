@@ -8,7 +8,7 @@ import {
   Scripts,
   useRouterState,
 } from "@tanstack/react-router";
-import { useEffect, useState, type ReactNode } from "react";
+import { lazy, Suspense, useEffect, useState, type ReactNode } from "react";
 import { createPortal } from "react-dom";
 
 import appCss from "../styles.css?url";
@@ -19,10 +19,10 @@ import { supabase } from "@/integrations/supabase/client";
 import { AnnouncementBar } from "@/components/AnnouncementBar";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
-import { CartDrawer } from "@/components/CartDrawer";
 import { ArrowLeft, MessageCircle, Phone, X } from "lucide-react";
 import { useStore } from "@/lib/store";
 
+const CartDrawer = lazy(() => import("@/components/CartDrawer").then((module) => ({ default: module.CartDrawer })));
 
 function NotFoundComponent() {
   return (
@@ -89,11 +89,14 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { property: "og:site_name", content: "MOLD" },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
+      { property: "og:image", content: "https://mold-streetwear.vercel.app/og-mold.jpg" },
+      { name: "twitter:image", content: "https://mold-streetwear.vercel.app/og-mold.jpg" },
     ],
     links: [
       { rel: "stylesheet", href: appCss },
       { rel: "preconnect", href: "https://fonts.googleapis.com" },
       { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
+      { rel: "preconnect", href: "https://mold-streetwear.vercel.app", crossOrigin: "anonymous" },
       {
         rel: "stylesheet",
         href: "https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Nunito+Sans:wght@400;500;600;700;800&display=swap",
@@ -144,8 +147,25 @@ function RootComponent() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <Shell />
+      <Suspense fallback={<ProductGridSkeleton />}><Shell /></Suspense>
     </QueryClientProvider>
+  );
+}
+
+function ProductGridSkeleton() {
+  return (
+    <main aria-label="Loading products" aria-busy="true" className="mx-auto min-h-screen max-w-[1500px] px-4 pt-28 sm:px-6">
+      <div className="mb-8 h-8 w-48 animate-pulse bg-secondary" />
+      <div className="grid grid-cols-2 gap-x-4 gap-y-10 sm:gap-x-5 lg:grid-cols-4">
+        {Array.from({ length: 4 }, (_, index) => (
+          <div key={index} className="animate-pulse">
+            <div className="aspect-[295/443] bg-secondary" />
+            <div className="mt-3 h-3 w-20 bg-secondary" />
+            <div className="mt-2 h-4 w-3/4 bg-secondary" />
+          </div>
+        ))}
+      </div>
+    </main>
   );
 }
 
@@ -250,9 +270,18 @@ function Shell() {
       </main>
       {!isAdminPage && <Footer />}
       {!isAdminPage && <FloatingWhatsApp />}
-      {!isAdminPage && <CartDrawer />}
+      {!isAdminPage && <DeferredCartDrawer />}
     </StoreProvider>
   );
+}
+
+function DeferredCartDrawer() {
+  const { cartOpen } = useStore();
+  const [hasOpened, setHasOpened] = useState(false);
+  useEffect(() => {
+    if (cartOpen) setHasOpened(true);
+  }, [cartOpen]);
+  return hasOpened ? <Suspense fallback={null}><CartDrawer /></Suspense> : null;
 }
 
 function FloatingWhatsApp() {

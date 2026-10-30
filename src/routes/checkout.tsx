@@ -13,6 +13,7 @@ import {
 } from "@/lib/reservation";
 import { saveRecentOrder } from "@/lib/recent-orders";
 import { supabase } from "@/integrations/supabase/client";
+import { mediaSrcSet } from "@/lib/media";
 import { listSavedAddresses, saveAddress, type SavedAddress } from "@/lib/saved-addresses.functions";
 import { getCheckoutPricing } from "@/lib/admin-operations.functions";
 
@@ -305,10 +306,13 @@ function Checkout() {
               <div key={`${line.productId}-${line.size}`} className="flex gap-3">
                 <img
                   src={product.images[0]}
+                  srcSet={mediaSrcSet(product.images[0]!)}
+                  sizes="56px"
                   alt={product.name}
                   width={120}
                   height={150}
                   loading="lazy"
+                  decoding="async"
                   className="h-16 w-14 shrink-0 object-cover"
                 />
                 <div className="min-w-0 flex-1">

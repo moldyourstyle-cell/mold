@@ -11,8 +11,8 @@ export function ProductGrid({ products, boxClassName, imageClassName, gridClassN
   }
   return (
     <div className={`grid grid-cols-2 gap-x-4 gap-y-10 sm:gap-x-5 sm:gap-y-12 lg:grid-cols-4 ${gridClassName ?? ""}`}>
-      {products.map((p, i) => (
-        <ProductCard key={p.id} product={p} priority={i < 2} boxClassName={boxClassName} imageClassName={imageClassName} />
+      {products.map((p) => (
+        <ProductCard key={p.id} product={p} boxClassName={boxClassName} imageClassName={imageClassName} />
       ))}
     </div>
   );

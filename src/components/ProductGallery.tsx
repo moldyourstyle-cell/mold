@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import { mediaSrcSet, responsiveMediaSrc } from "@/lib/media";
 
 export function ProductGallery({ images, name }: { images: string[]; name: string }) {
   const [active, setActive] = useState(0);
@@ -27,11 +28,14 @@ export function ProductGallery({ images, name }: { images: string[]; name: strin
             }`}
           >
             <img
-              src={src}
-              alt=""
+              src={responsiveMediaSrc(src)}
+              srcSet={mediaSrcSet(src)}
+              sizes="64px"
+              alt={`${name} view ${i + 1}`}
               width={295}
               height={443}
               loading="lazy"
+              decoding="async"
               className="h-full w-full object-cover"
             />
           </button>
@@ -42,11 +46,14 @@ export function ProductGallery({ images, name }: { images: string[]; name: strin
         {images[activeIndex] && (
           <img
             key={images[activeIndex]}
-            src={images[activeIndex]}
+            src={responsiveMediaSrc(images[activeIndex]!)}
+            srcSet={mediaSrcSet(images[activeIndex]!)}
+            sizes="(max-width: 1023px) 100vw, 55vw"
             alt={`${name} — view ${activeIndex + 1}`}
             width={400}
             height={500}
-            fetchPriority="high"
+            loading="lazy"
+            decoding="async"
             className="aspect-[4/5] w-full object-cover lg:aspect-[45/56]"
           />
         )}

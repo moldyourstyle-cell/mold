@@ -1,6 +1,7 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { categories, type CategorySlug } from "@/data/products";
 import { useCatalog } from "@/lib/catalog";
+import { site } from "@/config/site";
 
 import { ProductGrid } from "@/components/ProductGrid";
 
@@ -86,6 +87,29 @@ function Shop() {
   });
 
   const active = categories.find((c) => c.slug === search.category);
+
+  if (active && !products.some((product) => product.category === active.slug)) {
+    return (
+      <section className="mx-auto flex min-h-[55vh] max-w-[1500px] flex-col items-start justify-center px-4 py-20 sm:px-6">
+        <span className="label-mono text-muted-ink">Shop — {active.name}</span>
+        <h1 className="display mt-3 text-[clamp(2.5rem,8vw,6rem)]">Coming soon</h1>
+        <p className="mt-4 max-w-[46ch] text-sm leading-6 text-muted-ink">
+          This category is dropping soon. Join the WhatsApp group to get first access.
+        </p>
+        <div className="mt-8 flex flex-wrap gap-3">
+          <a href={site.whatsapp} target="_blank" rel="noopener noreferrer" className="inline-flex min-h-12 items-center bg-ink px-6 text-[11px] font-semibold uppercase tracking-[0.14em] text-paper transition-colors hover:bg-accent hover:text-ink">
+            Join WhatsApp group
+          </a>
+          <Link to="/shop" search={{ category: "jackets" }} className="inline-flex min-h-12 items-center border border-ink px-6 text-[11px] font-semibold uppercase tracking-[0.14em] transition-colors hover:bg-ink hover:text-paper">
+            Shop Jackets
+          </Link>
+          <Link to="/shop" className="inline-flex min-h-12 items-center px-3 text-[11px] font-semibold uppercase tracking-[0.14em] text-muted-ink hover:text-ink">
+            Shop all
+          </Link>
+        </div>
+      </section>
+    );
+  }
 
   return (
     <div className="mx-auto max-w-[1500px] px-4 py-10 sm:px-6 sm:py-14">

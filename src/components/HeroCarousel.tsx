@@ -38,7 +38,7 @@ export function HeroCarousel({ content }: { content: HeroContent }) {
             <SiteMedia
               src={item.image}
               alt={item.imageAlt}
-              eager
+              eager={i === 0}
               width={1920}
               height={1080}
               className="h-full w-full object-cover object-center"

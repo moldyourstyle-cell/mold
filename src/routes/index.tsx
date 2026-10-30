@@ -7,14 +7,16 @@ import { CategoryCard } from "@/components/CategoryCard";
 import { ProductGrid } from "@/components/ProductGrid";
 import { Newsletter } from "@/components/Newsletter";
 import { EditorialLookbook } from "@/components/EditorialLookbook";
-import { InstagramFeed } from "@/components/InstagramFeed";
+import { DeferredInstagramFeed } from "@/components/DeferredInstagramFeed";
 import { HeroCarousel } from "@/components/HeroCarousel";
 import { ProductDetailEditorial } from "@/components/ProductDetailEditorial";
 import { useEffect, useState } from "react";
+import { normalizeHero } from "@/lib/site-content";
+import { mediaSrcSet, responsiveMediaSrc } from "@/lib/media";
 
 export const Route = createFileRoute("/")({
   loader: ({ context }) => context.queryClient.ensureQueryData(siteContentQuery),
-  head: () => ({
+  head: ({ loaderData }) => ({
     meta: [
       { title: "MOLD — Built Heavy | Chennai Streetwear" },
       {
@@ -31,7 +33,19 @@ export const Route = createFileRoute("/")({
       { name: "twitter:card", content: "summary_large_image" },
       { property: "og:url", content: "/" },
     ],
-    links: [{ rel: "canonical", href: "/" }],
+    links: [
+      { rel: "canonical", href: "https://mold-streetwear.vercel.app/" },
+      {
+        rel: "preload",
+        as: "image",
+        href: responsiveMediaSrc(normalizeHero(loaderData?.hero).slides[0]?.image || "/products/hero-800.webp"),
+        imageSrcSet: normalizeHero(loaderData?.hero).slides[0]
+          ? mediaSrcSet(normalizeHero(loaderData?.hero).slides[0]!.image)
+          : undefined,
+        imageSizes: "100vw",
+        fetchPriority: "high",
+      },
+    ],
   }),
   component: Home,
 });
@@ -75,6 +89,7 @@ function Home() {
               slug={c.slug}
               name={c.name}
               image={c.image}
+              srcSet={c.srcSet}
               count={products.filter((p) => p.category === c.slug).length}
             />
           ))}
@@ -100,7 +115,7 @@ function Home() {
       <ProductDetailEditorial content={showcase} />
 
       <EditorialLookbook content={lookbook} compact />
-      <InstagramFeed content={instagram} />
+      <DeferredInstagramFeed content={instagram} />
 
       <Newsletter />
     </>

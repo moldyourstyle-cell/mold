@@ -108,8 +108,7 @@ export function Footer() {
       </div>
       <div className="border-t border-paper/10">
         <div className="mx-auto flex max-w-[1500px] flex-col items-start justify-between gap-3 px-4 py-5 sm:flex-row sm:items-center sm:px-6">
-          <span className="label-mono text-paper/40">© 2026 MOLD — Chennai, IN</span>
-          <span className="label-mono text-paper/40">COD</span>
+          <span className="label-mono text-paper/40">© 2026 MOLD — Chennai, India</span>
         </div>
       </div>
     </footer>

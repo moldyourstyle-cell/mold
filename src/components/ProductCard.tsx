@@ -1,13 +1,15 @@
 import { Link } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
-import { Heart } from "lucide-react";
+import { Heart, Plus } from "lucide-react";
 import { discountPercent, type Product } from "@/data/products";
 import { formatINR } from "@/lib/format";
 import { useStore } from "@/lib/store";
+import { mediaSrcSet, responsiveMediaSrc } from "@/lib/media";
 
-export function ProductCard({ product, priority, boxClassName, imageClassName }: { product: Product; priority?: boolean; boxClassName?: string; imageClassName?: string }) {
+export function ProductCard({ product, boxClassName, imageClassName }: { product: Product; boxClassName?: string; imageClassName?: string }) {
   const cardRef = useRef<HTMLElement>(null);
   const [visible, setVisible] = useState(false);
+  const [secondaryLoaded, setSecondaryLoaded] = useState(false);
   const { addToCart, toggleWishlist, wishlist } = useStore();
   const off = discountPercent(product);
   const wished = wishlist.includes(product.id);
@@ -33,9 +35,25 @@ export function ProductCard({ product, priority, boxClassName, imageClassName }:
     return () => observer.disconnect();
   }, []);
 
+  useEffect(() => {
+    if (!product.images[1] || secondaryLoaded) return;
+    const idleWindow = window as typeof window & {
+      requestIdleCallback?: (callback: () => void, options?: { timeout: number }) => number;
+      cancelIdleCallback?: (id: number) => void;
+    };
+    const timeout = window.setTimeout(() => setSecondaryLoaded(true), 2500);
+    const idle = idleWindow.requestIdleCallback?.(() => setSecondaryLoaded(true), { timeout: 2500 });
+    return () => {
+      window.clearTimeout(timeout);
+      if (idle !== undefined) idleWindow.cancelIdleCallback?.(idle);
+    };
+  }, [product.images, secondaryLoaded]);
+
   return (
     <article
       ref={cardRef}
+      onMouseEnter={() => setSecondaryLoaded(true)}
+      onFocus={() => setSecondaryLoaded(true)}
       className={`group transition-[opacity,transform] duration-700 ease-out motion-reduce:translate-y-0 motion-reduce:opacity-100 motion-reduce:transition-none ${boxClassName ?? ""} ${
         visible ? "translate-y-0 opacity-100" : "translate-y-5 opacity-0"
       }`}
@@ -48,19 +66,22 @@ export function ProductCard({ product, priority, boxClassName, imageClassName }:
           className="block h-full w-full"
         >
           <img
-            src={product.images[0]}
+            src={responsiveMediaSrc(product.images[0]!)}
+            srcSet={mediaSrcSet(product.images[0]!)}
+            sizes="(max-width: 639px) 130px, (max-width: 1023px) calc(50vw - 28px), 25vw"
             alt={`${product.name} — MOLD ${product.category}`}
             width={1024}
             height={1280}
-            loading={priority ? "eager" : "lazy"}
+            loading="lazy"
             decoding="async"
             className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.03]"
           />
-          {product.images[1] && (
+          {product.images[1] && secondaryLoaded && (
             <img
-              src={product.images[1]}
-              alt=""
-              aria-hidden
+              src={responsiveMediaSrc(product.images[1]!)}
+              alt={`${product.name} alternate view`}
+              srcSet={mediaSrcSet(product.images[1])}
+              sizes="(max-width: 639px) 130px, (max-width: 1023px) calc(50vw - 28px), 25vw"
               width={1024}
               height={1280}
               loading="lazy"
@@ -95,9 +116,11 @@ export function ProductCard({ product, priority, boxClassName, imageClassName }:
         {!soldOut && (
           <button
             onClick={() => addToCart(product.id, product.sizes[Math.min(1, product.sizes.length - 1)] ?? "M")}
-            className="absolute bottom-2 left-2 right-12 hidden translate-y-[calc(100%+1rem)] rounded-md bg-ink/50 py-2.5 text-[10px] font-semibold uppercase tracking-[0.12em] text-paper shadow-sm backdrop-blur-sm transition-transform duration-300 group-hover:translate-y-0 sm:block"
+            aria-label={`Quick add ${product.name} to cart`}
+            title={`Quick add ${product.name}`}
+            className="absolute bottom-2 left-2 z-10 hidden size-8 translate-y-[calc(100%+1rem)] place-items-center rounded-md bg-ink/70 text-paper shadow-sm backdrop-blur-sm transition-transform duration-300 group-hover:translate-y-0 focus-visible:translate-y-0 sm:grid"
           >
-            Quick add +
+            <Plus className="size-4" aria-hidden="true" />
           </button>
         )}
       </div>
