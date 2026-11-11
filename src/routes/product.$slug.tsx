@@ -14,7 +14,7 @@ import { ProductGrid } from "@/components/ProductGrid";
 
 export const Route = createFileRoute("/product/$slug")({
   loader: async ({ params, context }) => {
-    if (params.slug === "outdoorin") {
+    if (["outdoorin", "outdoor", "jacket"].includes(params.slug)) {
       throw redirect({ to: "/product/$slug", params: { slug: "outdoor-jacket" }, statusCode: 301 });
     }
     const products = await context.queryClient.ensureQueryData(catalogQuery);
@@ -32,6 +32,8 @@ export const Route = createFileRoute("/product/$slug")({
     const p = loaderData.product;
     const title = `${p.name} — MOLD`;
     const description = p.description.slice(0, 155);
+    const canonical = `https://mold-streetwear.vercel.app/product/${encodeURIComponent(p.slug)}`;
+    const image = new URL(p.images[0]!, "https://mold-streetwear.vercel.app").href;
     return {
       meta: [
         { title },
@@ -39,9 +41,11 @@ export const Route = createFileRoute("/product/$slug")({
         { property: "og:title", content: title },
         { property: "og:description", content: description },
         { property: "og:type", content: "product" },
-        { property: "og:url", content: `/product/${params.slug}` },
+        { property: "og:url", content: canonical },
+        { property: "og:image", content: image },
+        { name: "twitter:image", content: image },
       ],
-      links: [{ rel: "canonical", href: `/product/${params.slug}` }],
+      links: [{ rel: "canonical", href: canonical }],
       scripts: [
         {
           type: "application/ld+json",

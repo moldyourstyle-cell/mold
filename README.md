@@ -1,5 +1,9 @@
 # MOLD Reimagined
 
+## AI fitting room
+
+The shop's **Try this on** actions open the selected product in the fitting room. Live try-on requires `@decartai/sdk` dependencies to be installed and `DECART_API_KEY` to be available to the website server. For local development, add the key to the project root `.env`; for deployment, add it as a server-side environment variable in the hosting provider. Do not expose the permanent key through a `VITE_` variable or frontend code. Camera access requires HTTPS (or `localhost` during local development).
+
 https://mold-clothing-streetwear.lovable.app/
 I want to completely rebuild my existing MOLD clothing brand website from scratch.
 

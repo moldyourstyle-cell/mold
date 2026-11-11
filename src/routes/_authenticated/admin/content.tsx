@@ -181,8 +181,6 @@ function ContentEditor() {
                 <div className="sm:col-span-2"><Field label="Image alt text" value={slide.imageAlt} onChange={(v) => updateSlide(index, "imageAlt", v)} /></div>
                 <Field label="Primary button label" value={slide.primaryLabel} onChange={(v) => updateSlide(index, "primaryLabel", v)} />
                 <Field label="Primary button link" value={slide.primaryHref} onChange={(v) => updateSlide(index, "primaryHref", v)} />
-                <Field label="Secondary button label" value={slide.secondaryLabel} onChange={(v) => updateSlide(index, "secondaryLabel", v)} />
-                <Field label="Secondary button link" value={slide.secondaryHref} onChange={(v) => updateSlide(index, "secondaryHref", v)} />
               </div>
             </div>
           ))}

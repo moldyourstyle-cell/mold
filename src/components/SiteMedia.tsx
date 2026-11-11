@@ -27,7 +27,7 @@ export function SiteMedia({
   if (isVideoSource(src)) {
     return <LazyVideo
       src={responsiveMediaSrc(src)}
-      {...(poster ? { poster } : {})}
+      {...(poster ? { poster: responsiveMediaSrc(poster, 800) } : {})}
       alt={alt}
       className={className}
       eager={eager}
@@ -81,7 +81,8 @@ function LazyVideo({ src, poster, alt, className, eager }: {
         ref={videoRef}
         {...(load ? { src } : {})}
         {...(poster ? { poster } : {})}
-        aria-label={alt}
+        aria-hidden="true"
+        tabIndex={-1}
         className={className}
         autoPlay={load}
         muted

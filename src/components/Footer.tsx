@@ -28,7 +28,7 @@ export function Footer() {
       <div className="mx-auto grid max-w-[1500px] grid-cols-2 gap-10 px-4 py-14 sm:px-6 md:grid-cols-4">
         <div className="col-span-2 md:col-span-1">
           <span className="display text-3xl">MOLD</span>
-          <p className="label-mono mt-4 leading-relaxed text-paper/50">
+          <p className="label-mono mt-4 leading-relaxed text-paper/75">
             {site.tagline}
             <br />
             {site.city}
@@ -108,7 +108,7 @@ export function Footer() {
       </div>
       <div className="border-t border-paper/10">
         <div className="mx-auto flex max-w-[1500px] flex-col items-start justify-between gap-3 px-4 py-5 sm:flex-row sm:items-center sm:px-6">
-          <span className="label-mono text-paper/40">© 2026 MOLD — Chennai, India</span>
+          <span className="label-mono text-paper/75">© 2026 MOLD — Chennai, India</span>
         </div>
       </div>
     </footer>

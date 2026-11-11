@@ -60,6 +60,7 @@ export function StoreProvider({
   const { data: checkoutPricing } = useQuery({
     queryKey: ["checkout-pricing"],
     queryFn: () => loadCheckoutPricing(),
+    staleTime: 5 * 60_000,
   });
   const shippingFee = checkoutPricing?.shippingFee ?? site.shippingFee;
   const freeShippingThreshold = checkoutPricing?.freeShippingThreshold ?? site.freeShippingThreshold;

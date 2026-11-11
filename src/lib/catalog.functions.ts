@@ -15,8 +15,8 @@ export function rowToProduct(row: Row): Product {
     .replace(/Wide leg baggy feel free moment/gi, "Wide-leg, baggy, built for movement");
   return {
     id: row.id,
-    slug: ["outdoorin", "outdoor"].includes(row.slug) ? "outdoor-jacket" : row.slug,
-    name: ["outdoorin", "outdoor"].includes(row.slug) || cleanName.toLowerCase() === "outdoor"
+    slug: ["outdoorin", "outdoor", "jacket"].includes(row.slug) ? "outdoor-jacket" : row.slug,
+    name: ["outdoorin", "outdoor", "jacket"].includes(row.slug) || cleanName.toLowerCase() === "outdoor"
       ? "Outdoor Jacket"
       : titleName,
     category: row.category as CategorySlug,

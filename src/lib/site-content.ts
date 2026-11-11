@@ -7,8 +7,6 @@ export type HeroSlide = {
   imageAlt: string;
   primaryLabel: string;
   primaryHref: string;
-  secondaryLabel: string;
-  secondaryHref: string;
 };
 
 /** Hero supports multiple slides. Legacy single-slide fields stay readable. */
@@ -77,8 +75,6 @@ export const emptyHeroSlide: HeroSlide = {
   imageAlt: "MOLD campaign image",
   primaryLabel: "Shop now",
   primaryHref: "/shop",
-  secondaryLabel: "View editorial",
-  secondaryHref: "/lookbook",
 };
 
 /** Normalises legacy single-slide hero content into a slide list. */

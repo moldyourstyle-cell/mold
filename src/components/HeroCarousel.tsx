@@ -66,12 +66,6 @@ export function HeroCarousel({ content }: { content: HeroContent }) {
               >
                 {slide.primaryLabel}
               </a>
-              <a
-                href={slide.secondaryHref}
-                className="inline-flex min-h-8 w-fit items-center justify-center border border-paper/60 px-3 py-1.5 text-[8px] font-semibold uppercase tracking-[0.08em] text-paper transition-colors hover:bg-paper hover:text-ink sm:min-h-10 sm:px-5 sm:py-2 sm:text-[10px] sm:tracking-[0.12em] lg:min-h-10 lg:px-5 lg:py-2"
-              >
-                {slide.secondaryLabel}
-              </a>
             </div>
           </div>
         </div>

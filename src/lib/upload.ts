@@ -2,15 +2,11 @@ import { supabase } from "@/integrations/supabase/client";
 
 export const PRODUCT_IMAGE_BUCKET = "product-images";
 
-/** Types Supabase storage will accept as-is. Anything else is converted to JPEG first. */
-const DIRECT_TYPES = ["image/jpeg", "image/png", "image/webp", "image/avif"];
 const MAX_BYTES = 10 * 1024 * 1024;
-const MAX_DIMENSION = 2400;
+const MAX_DIMENSION = 1600;
 
 function extensionFor(type: string) {
-  if (type === "image/png") return "png";
   if (type === "image/webp") return "webp";
-  if (type === "image/avif") return "avif";
   return "jpg";
 }
 
@@ -22,17 +18,14 @@ function randomName(type: string) {
   return `${id}.${extensionFor(type)}`;
 }
 
-/** Re-encodes an image in the browser so heavy phone photos and odd formats still upload. */
+/** Re-encodes every uploaded image so source photos are resized and stored compressed. */
 async function toUploadableFile(file: File): Promise<File> {
-  const needsConvert = !DIRECT_TYPES.includes(file.type) || file.size > MAX_BYTES;
-  if (!needsConvert) return file;
-
   let bitmap: ImageBitmap;
   try {
     bitmap = await createImageBitmap(file);
   } catch {
     throw new Error(
-      `${file.name} isn't an image this browser can read. Please save it as a JPG or PNG and try again.`,
+      `${file.name} isn't an image this browser can read. Please save it as a JPG, PNG or WebP and try again.`,
     );
   }
 
@@ -49,13 +42,21 @@ async function toUploadableFile(file: File): Promise<File> {
   bitmap.close?.();
 
   const blob = await new Promise<Blob | null>((resolve) =>
-    canvas.toBlob((result) => resolve(result), "image/jpeg", 0.85),
+    canvas.toBlob((result) => resolve(result), "image/webp", 0.82),
   );
   if (!blob) throw new Error("Could not process the image in this browser.");
+  if (blob.type !== "image/webp") {
+    const jpeg = await new Promise<Blob | null>((resolve) =>
+      canvas.toBlob((result) => resolve(result), "image/jpeg", 0.82),
+    );
+    if (!jpeg) throw new Error("Could not process the image in this browser.");
+    if (jpeg.size > MAX_BYTES) throw new Error(`${file.name} is too large even after compressing. Try a smaller photo.`);
+    return new File([jpeg], `${file.name.replace(/\.[^.]+$/, "")}.jpg`, { type: "image/jpeg" });
+  }
   if (blob.size > MAX_BYTES) {
     throw new Error(`${file.name} is too large even after compressing. Try a smaller photo.`);
   }
-  return new File([blob], `${file.name.replace(/\.[^.]+$/, "")}.jpg`, { type: "image/jpeg" });
+  return new File([blob], `${file.name.replace(/\.[^.]+$/, "")}.webp`, { type: "image/webp" });
 }
 
 /** Uploads an image file from the admin's computer and returns the URL to store on the product. */

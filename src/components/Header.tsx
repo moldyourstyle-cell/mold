@@ -72,6 +72,10 @@ export function Header({ transparentOnHome = false }: { transparentOnHome?: bool
             Lookbook
             <span className="absolute -bottom-0.5 left-0 h-px w-0 bg-accent transition-all duration-300 group-hover:w-full" />
           </Link>
+          <Link to="/fitting-room" className="group relative text-[11px] font-medium uppercase tracking-[0.14em]">
+            AI Fitting Room
+            <span className="absolute -bottom-0.5 left-0 h-px w-0 bg-accent transition-all duration-300 group-hover:w-full" />
+          </Link>
         </nav>
 
         <div className="flex items-center justify-end gap-3 sm:gap-4">
@@ -139,6 +143,7 @@ export function Header({ transparentOnHome = false }: { transparentOnHome?: bool
     <div
       className={`fixed inset-0 z-[70] lg:hidden ${menuOpen ? "" : "pointer-events-none"}`}
       aria-hidden={!menuOpen}
+      inert={!menuOpen}
     >
         {/* Backdrop: tap outside to close, homepage stays visible */}
         <div
@@ -184,6 +189,13 @@ export function Header({ transparentOnHome = false }: { transparentOnHome?: bool
               Lookbook
             </Link>
             <Link
+              to="/fitting-room"
+              onClick={() => setMenuOpen(false)}
+              className="font-nunito block min-h-[23px] border-b border-paper/10 py-1.5 text-[23px] font-semibold uppercase leading-[23px]"
+            >
+              AI Fitting Room
+            </Link>
+            <Link
               to="/track"
               onClick={() => setMenuOpen(false)}
               className="font-nunito block min-h-[23px] border-b border-paper/10 py-1.5 text-[23px] font-semibold uppercase leading-[23px]"
@@ -193,14 +205,14 @@ export function Header({ transparentOnHome = false }: { transparentOnHome?: bool
             <Link
               to="/account"
               onClick={() => setMenuOpen(false)}
-              className="font-nunito block pt-5 text-sm text-paper/60"
+              className="font-nunito block pt-5 text-sm text-paper/75"
             >
               Account
             </Link>
             <Link
               to="/wishlist"
               onClick={() => setMenuOpen(false)}
-              className="font-nunito block py-2 text-sm text-paper/60"
+              className="font-nunito block py-2 text-sm text-paper/75"
             >
               Wishlist · {wishlist.length}
             </Link>

@@ -31,7 +31,9 @@ export const Route = createFileRoute("/")({
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
-      { property: "og:url", content: "/" },
+      { property: "og:url", content: "https://mold-streetwear.vercel.app/" },
+      { property: "og:image", content: "https://mold-streetwear.vercel.app/og-mold-1600.webp" },
+      { name: "twitter:image", content: "https://mold-streetwear.vercel.app/og-mold-1600.webp" },
     ],
     links: [
       { rel: "canonical", href: "https://mold-streetwear.vercel.app/" },

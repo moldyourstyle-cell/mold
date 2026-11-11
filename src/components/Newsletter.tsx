@@ -9,7 +9,7 @@ export function Newsletter() {
             <br />
             the next drop.
           </h2>
-          <p className="mt-5 max-w-[38ch] text-sm text-paper/60">
+          <p className="mt-5 max-w-[38ch] text-sm text-paper/75">
             Get first access to new drops, limited releases and MOLD updates.
           </p>
         </div>

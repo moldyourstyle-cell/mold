@@ -9,10 +9,10 @@ export function InstagramFeed({ content }: { content: InstagramContent }) {
       <div className="mx-auto max-w-[1500px] px-4 sm:px-6">
         <div className="flex flex-col gap-5 border-t border-paper/20 pt-5 sm:flex-row sm:items-end sm:justify-between">
           <div>
-            <span className="label-mono text-paper/50">{content.eyebrow}</span>
-            <h2 className="display section-heading mt-3">{content.title}</h2>
+            <span className="label-mono text-paper/75">{content.eyebrow}</span>
+            <h2 className="display section-heading mt-3">{content.title || "WORN OUTSIDE"}</h2>
           </div>
-          <a href={content.profileUrl} target="_blank" rel="noreferrer" className="label-mono flex items-center gap-2 text-accent hover:text-paper">
+          <a href={cleanInstagramUrl(content.profileUrl)} target="_blank" rel="noreferrer" className="label-mono flex items-center gap-2 text-accent hover:text-paper">
             {content.handle} <ExternalLink className="h-3.5 w-3.5" />
           </a>
         </div>
@@ -38,5 +38,18 @@ function PostCard({ post }: { post: InstagramContent["posts"][number] }) {
     <SiteMedia src={post.image} alt={post.alt || post.caption} className="absolute inset-0 h-full w-full object-cover transition duration-500 group-hover:scale-[1.03] group-hover:opacity-75" />
     <div className="absolute inset-x-0 bottom-0 translate-y-full bg-ink/90 p-4 transition-transform duration-300 group-hover:translate-y-0"><span className="label-mono text-paper">{post.caption || "View on Instagram ↗"}</span></div>
   </div>;
-  return directPost ? <a href={post.url} target="_blank" rel="noopener noreferrer" aria-label={`Open Instagram post: ${post.caption}`} className="block">{card}</a> : card;
+  return directPost ? <a href={cleanInstagramUrl(post.url)} target="_blank" rel="noopener noreferrer" aria-label={`Open Instagram post: ${post.caption}`} className="block">{card}</a> : card;
+}
+
+function cleanInstagramUrl(value: string) {
+  try {
+    const url = new URL(value);
+    for (const key of [...url.searchParams.keys()]) {
+      const lower = key.toLowerCase();
+      if (["stkn", "srtk", "cplk"].includes(lower) || lower.startsWith("utm_")) url.searchParams.delete(key);
+    }
+    return url.toString();
+  } catch {
+    return value;
+  }
 }

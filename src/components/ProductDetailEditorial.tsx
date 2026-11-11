@@ -63,7 +63,7 @@ export function ProductDetailEditorial({ content, preview = false, mobile = fals
         </figure>}
         <div className="relative col-span-2 py-2 md:px-4 md:py-0 lg:col-span-1 lg:pl-3 lg:px-0">
           <span className="label-mono text-muted-ink">MOLD — EDITORIAL</span>
-          <h2 className="display mt-4 text-[clamp(2.25rem,4vw,4rem)]">{content.detailHeading}</h2>
+          <h2 className="display mt-4 text-[clamp(2.25rem,4vw,4rem)]">{content.detailHeading || "MADE TO MOVE. BUILT TO LAST."}</h2>
           <p className="mt-6 max-w-[34ch] text-sm leading-7 text-muted-ink">{content.detailText}</p>
         </div>
       </div>

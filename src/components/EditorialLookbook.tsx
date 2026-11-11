@@ -13,7 +13,7 @@ export function EditorialLookbook({ content, compact = false }: { content: Lookb
       <div className="mx-auto max-w-[1500px] px-4 sm:px-6">
         <div className="pt-4 sm:pt-5">
           <div className="flex flex-col gap-3 lg:flex-row lg:items-end lg:justify-between">
-            <h2 className="display section-heading">{content.title}</h2>
+            <h2 className="display section-heading">{content.title || "CONCRETE / HEAT / MOTION"}</h2>
             <span className="label-mono shrink-0 text-muted-ink">{content.season}</span>
           </div>
         </div>

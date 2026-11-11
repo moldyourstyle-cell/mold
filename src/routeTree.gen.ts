@@ -15,10 +15,12 @@ import { Route as AccountRouteImport } from './routes/account'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as CartRouteImport } from './routes/cart'
 import { Route as CheckoutRouteImport } from './routes/checkout'
+import { Route as FittingRoomRouteImport } from './routes/fitting-room'
 import { Route as LookbookRouteImport } from './routes/lookbook'
 import { Route as ShopRouteImport } from './routes/shop'
 import { Route as TrackRouteImport } from './routes/track'
 import { Route as WishlistRouteImport } from './routes/wishlist'
+import { Route as ApiFittingRoomTokenRouteImport } from './routes/api/fitting-room-token'
 import { Route as HelpTopicRouteImport } from './routes/help.$topic'
 import { Route as ProductSlugRouteImport } from './routes/product.$slug'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin/index'
@@ -62,6 +64,11 @@ const CheckoutRoute = CheckoutRouteImport.update({
   path: '/checkout',
   getParentRoute: () => rootRouteImport,
 } as any)
+const FittingRoomRoute = FittingRoomRouteImport.update({
+  id: '/fitting-room',
+  path: '/fitting-room',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const LookbookRoute = LookbookRouteImport.update({
   id: '/lookbook',
   path: '/lookbook',
@@ -80,6 +87,11 @@ const TrackRoute = TrackRouteImport.update({
 const WishlistRoute = WishlistRouteImport.update({
   id: '/wishlist',
   path: '/wishlist',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiFittingRoomTokenRoute = ApiFittingRoomTokenRouteImport.update({
+  id: '/api/fitting-room-token',
+  path: '/api/fitting-room-token',
   getParentRoute: () => rootRouteImport,
 } as any)
 const HelpTopicRoute = HelpTopicRouteImport.update({
@@ -163,10 +175,12 @@ export interface FileRoutesByFullPath {
   '/auth': typeof AuthRoute
   '/cart': typeof CartRoute
   '/checkout': typeof CheckoutRoute
+  '/fitting-room': typeof FittingRoomRoute
   '/lookbook': typeof LookbookRoute
   '/shop': typeof ShopRoute
   '/track': typeof TrackRoute
   '/wishlist': typeof WishlistRoute
+  '/api/fitting-room-token': typeof ApiFittingRoomTokenRoute
   '/help/$topic': typeof HelpTopicRoute
   '/product/$slug': typeof ProductSlugRoute
   '/admin/analytics': typeof AuthenticatedAdminAnalyticsRoute
@@ -187,10 +201,12 @@ export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
   '/cart': typeof CartRoute
   '/checkout': typeof CheckoutRoute
+  '/fitting-room': typeof FittingRoomRoute
   '/lookbook': typeof LookbookRoute
   '/shop': typeof ShopRoute
   '/track': typeof TrackRoute
   '/wishlist': typeof WishlistRoute
+  '/api/fitting-room-token': typeof ApiFittingRoomTokenRoute
   '/help/$topic': typeof HelpTopicRoute
   '/product/$slug': typeof ProductSlugRoute
   '/admin/analytics': typeof AuthenticatedAdminAnalyticsRoute
@@ -213,10 +229,12 @@ export interface FileRoutesById {
   '/auth': typeof AuthRoute
   '/cart': typeof CartRoute
   '/checkout': typeof CheckoutRoute
+  '/fitting-room': typeof FittingRoomRoute
   '/lookbook': typeof LookbookRoute
   '/shop': typeof ShopRoute
   '/track': typeof TrackRoute
   '/wishlist': typeof WishlistRoute
+  '/api/fitting-room-token': typeof ApiFittingRoomTokenRoute
   '/help/$topic': typeof HelpTopicRoute
   '/product/$slug': typeof ProductSlugRoute
   '/_authenticated/admin/analytics': typeof AuthenticatedAdminAnalyticsRoute
@@ -239,10 +257,12 @@ export interface FileRouteTypes {
     | '/auth'
     | '/cart'
     | '/checkout'
+    | '/fitting-room'
     | '/lookbook'
     | '/shop'
     | '/track'
     | '/wishlist'
+    | '/api/fitting-room-token'
     | '/help/$topic'
     | '/product/$slug'
     | '/admin/analytics'
@@ -263,10 +283,12 @@ export interface FileRouteTypes {
     | '/auth'
     | '/cart'
     | '/checkout'
+    | '/fitting-room'
     | '/lookbook'
     | '/shop'
     | '/track'
     | '/wishlist'
+    | '/api/fitting-room-token'
     | '/help/$topic'
     | '/product/$slug'
     | '/admin/analytics'
@@ -288,10 +310,12 @@ export interface FileRouteTypes {
     | '/auth'
     | '/cart'
     | '/checkout'
+    | '/fitting-room'
     | '/lookbook'
     | '/shop'
     | '/track'
     | '/wishlist'
+    | '/api/fitting-room-token'
     | '/help/$topic'
     | '/product/$slug'
     | '/_authenticated/admin/analytics'
@@ -314,10 +338,12 @@ export interface RootRouteChildren {
   AuthRoute: typeof AuthRoute
   CartRoute: typeof CartRoute
   CheckoutRoute: typeof CheckoutRoute
+  FittingRoomRoute: typeof FittingRoomRoute
   LookbookRoute: typeof LookbookRoute
   ShopRoute: typeof ShopRoute
   TrackRoute: typeof TrackRoute
   WishlistRoute: typeof WishlistRoute
+  ApiFittingRoomTokenRoute: typeof ApiFittingRoomTokenRoute
   HelpTopicRoute: typeof HelpTopicRoute
   ProductSlugRoute: typeof ProductSlugRoute
   ApiPublicMediaSplatRoute: typeof ApiPublicMediaSplatRoute
@@ -367,6 +393,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CheckoutRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/fitting-room': {
+      id: '/fitting-room'
+      path: '/fitting-room'
+      fullPath: '/fitting-room'
+      preLoaderRoute: typeof FittingRoomRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/lookbook': {
       id: '/lookbook'
       path: '/lookbook'
@@ -393,6 +426,13 @@ declare module '@tanstack/react-router' {
       path: '/wishlist'
       fullPath: '/wishlist'
       preLoaderRoute: typeof WishlistRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/fitting-room-token': {
+      id: '/api/fitting-room-token'
+      path: '/api/fitting-room-token'
+      fullPath: '/api/fitting-room-token'
+      preLoaderRoute: typeof ApiFittingRoomTokenRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/help/$topic': {
@@ -525,10 +565,12 @@ const rootRouteChildren: RootRouteChildren = {
   AuthRoute: AuthRoute,
   CartRoute: CartRoute,
   CheckoutRoute: CheckoutRoute,
+  FittingRoomRoute: FittingRoomRoute,
   LookbookRoute: LookbookRoute,
   ShopRoute: ShopRoute,
   TrackRoute: TrackRoute,
   WishlistRoute: WishlistRoute,
+  ApiFittingRoomTokenRoute: ApiFittingRoomTokenRoute,
   HelpTopicRoute: HelpTopicRoute,
   ProductSlugRoute: ProductSlugRoute,
   ApiPublicMediaSplatRoute: ApiPublicMediaSplatRoute,

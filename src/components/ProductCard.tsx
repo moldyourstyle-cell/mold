@@ -1,6 +1,6 @@
 import { Link } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
-import { Heart, Plus } from "lucide-react";
+import { Check, Heart, Plus, ScanLine } from "lucide-react";
 import { discountPercent, type Product } from "@/data/products";
 import { formatINR } from "@/lib/format";
 import { useStore } from "@/lib/store";
@@ -10,10 +10,17 @@ export function ProductCard({ product, boxClassName, imageClassName }: { product
   const cardRef = useRef<HTMLElement>(null);
   const [visible, setVisible] = useState(false);
   const [secondaryLoaded, setSecondaryLoaded] = useState(false);
+  const [justAdded, setJustAdded] = useState(false);
   const { addToCart, toggleWishlist, wishlist } = useStore();
   const off = discountPercent(product);
   const wished = wishlist.includes(product.id);
   const soldOut = product.stock === 0;
+
+  function quickAdd() {
+    addToCart(product.id, product.sizes[Math.min(1, product.sizes.length - 1)] ?? "M");
+    setJustAdded(true);
+    window.setTimeout(() => setJustAdded(false), 900);
+  }
 
   useEffect(() => {
     const card = cardRef.current;
@@ -115,12 +122,13 @@ export function ProductCard({ product, boxClassName, imageClassName }: { product
 
         {!soldOut && (
           <button
-            onClick={() => addToCart(product.id, product.sizes[Math.min(1, product.sizes.length - 1)] ?? "M")}
-            aria-label={`Quick add ${product.name} to cart`}
+            onClick={quickAdd}
+            aria-label={justAdded ? `${product.name} added to cart` : `Quick add ${product.name} to cart`}
+            aria-live="polite"
             title={`Quick add ${product.name}`}
             className="absolute bottom-2 left-2 z-10 hidden size-8 translate-y-[calc(100%+1rem)] place-items-center rounded-md bg-ink/70 text-paper shadow-sm backdrop-blur-sm transition-transform duration-300 group-hover:translate-y-0 focus-visible:translate-y-0 sm:grid"
           >
-            <Plus className="size-4" aria-hidden="true" />
+            {justAdded ? <Check className="size-4" aria-hidden="true" /> : <Plus className="size-4" aria-hidden="true" />}
           </button>
         )}
       </div>
@@ -143,6 +151,15 @@ export function ProductCard({ product, boxClassName, imageClassName }: { product
           )}
         </div>
       </div>
+      <Link
+        to="/fitting-room"
+        search={{ product: product.slug }}
+        aria-label={`Try on ${product.name}`}
+        className="label-mono mt-3 inline-flex min-h-10 items-center gap-2 border border-line px-3 text-[10px] transition-colors hover:border-ink hover:bg-ink hover:text-paper"
+      >
+        <ScanLine className="h-4 w-4" aria-hidden="true" />
+        Try this on
+      </Link>
     </article>
   );
 }

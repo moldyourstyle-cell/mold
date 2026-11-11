@@ -51,7 +51,10 @@ export function CartDrawer() {
         aria-hidden
       />
       <aside
+        role="dialog"
+        aria-modal="true"
         aria-label="Cart"
+        inert={!cartOpen}
         className={`fixed right-0 top-0 z-[80] flex h-full w-full max-w-md flex-col bg-paper transition-transform duration-300 ${
           cartOpen ? "translate-x-0" : "translate-x-full"
         }`}
