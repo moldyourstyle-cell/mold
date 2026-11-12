@@ -151,8 +151,8 @@ function FittingRoomPage() {
 
         <section className="border border-line bg-secondary/50 p-4 sm:p-5">
           <div className="label-mono flex justify-between text-muted-ink"><span>02 / LIVE MIRROR</span><span>{cameraOn ? "CAMERA READY" : "STANDBY"}</span></div>
-          <div className="relative mt-4 grid aspect-[16/10] place-items-center overflow-hidden bg-ink text-paper">
-            <video ref={camera} autoPlay muted playsInline className={cameraOn && !aiConnected ? "h-full w-full object-cover" : "hidden"}/>
+          <div className="relative mt-4 grid aspect-[3/4] place-items-center overflow-hidden bg-ink text-paper md:aspect-[16/10]">
+            <video ref={camera} autoPlay muted playsInline className={cameraOn && !aiConnected ? "h-full w-full object-contain md:object-cover" : "hidden"}/>
             <video ref={resultVideo} autoPlay muted playsInline className={aiConnected ? "h-full w-full object-contain" : "hidden"}/>
             {!cameraOn && <div className="text-center"><Camera className="mx-auto mb-4 h-10 w-10 text-paper/60"/><h2 className="display text-2xl">THE MIRROR IS WAITING</h2><p className="mt-2 text-xs text-paper/60">Choose a product, then start your AI fitting.</p></div>}
             <span className="label-mono absolute bottom-3 right-4 text-[10px] text-paper/70">MOLD / FIT CHECK</span>
